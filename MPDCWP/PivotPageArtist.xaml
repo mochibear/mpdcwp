@@ -1,0 +1,79 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="MPDCWP.PivotPageArtist"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait"  Orientation="Portrait"
+    shell:SystemTray.IsVisible="True">
+	<phone:PhoneApplicationPage.Resources>
+		<DataTemplate x:Key="AlbumsItemTemplate">
+			<StackPanel Orientation="Horizontal">
+                <toolkit:ContextMenuService.ContextMenu>
+                    <toolkit:ContextMenu>
+                        <toolkit:MenuItem Header="Add to playlist" Click="ContextMenuItem_Click"/>
+                    </toolkit:ContextMenu>
+                </toolkit:ContextMenuService.ContextMenu>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+				<TextBlock Text="{Binding Title}"  FontSize="30" VerticalAlignment="Bottom" x:Name="textBlockTrackTitle" TextWrapping="Wrap" />					
+				</StackPanel>
+				<Path Data="M97,-140" Fill="#FFF4F4F5" Height="0" Stretch="Fill" Stroke="Black" UseLayoutRounding="False" Width="0"/>
+			</StackPanel>
+		</DataTemplate>
+		<DataTemplate x:Key="TracksItemTemplate">
+			<StackPanel Orientation="Horizontal">
+				<Button BorderBrush="{x:Null}" Width="70" Height="70">
+                    <Button.Background>
+                        <ImageBrush ImageSource="/MPDCWP;component/Images/appbar.add.rest.png" />
+                    </Button.Background>
+                </Button>
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+				<TextBlock Text="{Binding Number}" VerticalAlignment="Bottom"  FontSize="30" x:Name="textBlockTrackNumber" />
+				<TextBlock Text=". " VerticalAlignment="Bottom" FontSize="30" />	
+				<TextBlock Text="{Binding Title}"  FontSize="30" VerticalAlignment="Bottom" x:Name="textBlockTrackTitle" />					
+				</StackPanel>
+			</StackPanel>
+		</DataTemplate>
+	</phone:PhoneApplicationPage.Resources>
+
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot" Background="Transparent" d:DataContext="{Binding Source={StaticResource ArtisPageSampleData}}">
+        <!--Pivot Control-->
+        <controls:Pivot x:Name="pivotMain" Title="Artist name">
+            <!--Pivot item one-->
+            <controls:PivotItem x:Name="pivotAlbums" Header="albums">
+                <Grid>
+                	<ListBox Margin="8" ItemTemplate="{StaticResource AlbumsItemTemplate}" ItemsSource="{Binding Albums}" DataContext="{Binding}" Name="listBoxAlbums" SelectionChanged="listBoxAlbums_SelectionChanged" />
+                </Grid>
+            </controls:PivotItem>
+
+            <!--Pivot item two-->
+            <controls:PivotItem x:Name="pivotItemTracks" Header="tracks">
+                <Grid>
+                	<ListBox Margin="8" ItemTemplate="{StaticResource TracksItemTemplate}" ItemsSource="{Binding Tracks}" Name="listBoxTracks" />
+                </Grid>
+            </controls:PivotItem>
+        </controls:Pivot>
+    </Grid>
+
+    <!--Sample code showing usage of ApplicationBar-->
+    <!--<phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
+            <shell:ApplicationBarIconButton x:Name="appbar_button1" IconUri="/Images/appbar_button1.png" Text="Button 1"/>
+            <shell:ApplicationBarIconButton x:Name="appbar_button2" IconUri="/Images/appbar_button2.png" Text="Button 2"/>
+            <shell:ApplicationBar.MenuItems>
+                <shell:ApplicationBarMenuItem x:Name="menuItem1" Text="MenuItem 1"/>
+                <shell:ApplicationBarMenuItem x:Name="menuItem2" Text="MenuItem 2"/>
+            </shell:ApplicationBar.MenuItems>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>-->
+    
+</phone:PhoneApplicationPage>
