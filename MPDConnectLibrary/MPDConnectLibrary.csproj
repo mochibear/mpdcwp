@@ -49,6 +49,7 @@
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreateConnectionAsyncArgs.cs" />
     <Compile Include="MPDClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
