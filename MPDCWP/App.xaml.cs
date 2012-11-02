@@ -18,6 +18,15 @@
  * You should have received a copy of the GNU General Public License
  * along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * GKO Trac:
+ * https://trac.cc.jyu.fi/projects/gko/wiki/2012/mpdcwp
+ * 
+ * Doc:
+ * http://users.jyu.fi/~mamiahin/mpdcwpdoc/
+ * 
+ * GitHub:
+ * https://github.com/mattix/mpdcwp
+ * 
  */
 using System;
 using System.Collections.Generic;

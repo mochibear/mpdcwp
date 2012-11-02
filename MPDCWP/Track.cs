@@ -37,9 +37,20 @@ namespace MPDCWP
     /// </summary>
     public class Track
     {
+        private string id, title, artist, album;
         private int number;
 
 
+        /// <summary>
+        /// Track ID
+        /// </summary>
+        public string ID
+        {
+            get { return id; }
+            set { id = value; }
+        }
+        
+        
         /// <summary>
         /// Track number
         /// </summary>
@@ -49,14 +60,17 @@ namespace MPDCWP
             set { number = value; }
         }        
 
-        private string title;
-
-
+        
         /// <summary>
         /// Track title
         /// </summary>
         public string Title { get { return title; } set { this.title = value; } }
 
+
+        /// <summary>
+        /// Track as a string
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return Title;
@@ -66,17 +80,13 @@ namespace MPDCWP
         /// <summary>
         /// Track artist
         /// </summary>
-        private string artist;
-
         public string Artist
         {
             get { return artist; }
             set { artist = value; }
         }
 
-        private string album;
-
-
+       
         /// <summary>
         /// Track album
         /// </summary>
@@ -84,7 +94,6 @@ namespace MPDCWP
         {
             get { return album; }
             set { album = value; }
-        }
-        
+        }        
     }
 }

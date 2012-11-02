@@ -84,8 +84,7 @@ namespace MPDCWP
             listBoxPlaylist.ItemsSource = Playlist;
             this.Loaded += new RoutedEventHandler(MainPage_Loaded);
         }
-
-
+        
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             this.AddDemoData();
@@ -93,8 +92,7 @@ namespace MPDCWP
             listBoxSearch.ItemsSource = Artists;
             imageDownloader1.ImagePageUrl = imageSourceUrl + "anathema+weather+systems";
         }
-
-
+        
         private void AddDemoData()
         {
             string[] names = new string[] { "Anathema", "Eva & Manu", "In flames", "Opeth", "Pain", "Porcupine Tree", "Storm Corrosion", "Soilwork" };
@@ -107,23 +105,7 @@ namespace MPDCWP
                 Artists.Add(artist);
             }
         }
-
-
-        /// <summary>
-        /// PlayerControl play-handler
-        /// </summary>
-        /// <param name="sender">Sender</param>
-        /// <param name="e">Event args</param>
-        public void playerControl_Play(object sender, CancelRoutedEventArgs e)
-        {
-            if (Playlist.Count == 0)
-            {
-                MessageBox.Show("No songs in playlist");
-                e.Cancel = true;
-            }
-            PlayerStatus = "Playing";
-        }
-
+        
         private void playerControl_Pause(object sender, EventArgs e)
         {
             PlayerStatus = "Paused";
@@ -173,41 +155,7 @@ namespace MPDCWP
             // TODO Tee viive, ennen kuin käynnistetään haku tai sitten haun keskeytys
             //this.Find(textBoxSearch.Text);
         }
-
-
-        /// <summary>
-        /// Finds tracks containing given term and return results as a IEnumerableList
-        /// </summary>
-        /// <param name="term">Search term</param>
-        /// <returns>Search results</returns>
-        public IEnumerable<Track> Find(string term)
-        {
-            //str = str.ToLower();
-            //List<Artist> artists = new List<Artist>();
-            //List<Track> tracks = new List<Track>();
-            //List<Album> albums = new List<Album>();
-            //foreach (Artist artist in Artists)
-            //{
-            //    if (artist.Name.ToLower().Contains(str))
-            //        artists.Add(artist);
-            //    foreach (Album album in artist.Albums)
-            //    {
-            //        if (album.Title.ToLower().Contains(str))
-            //            albums.Add(album);
-            //        foreach (Track track in album.Tracks)
-            //        {
-            //            if (track.Title.ToLower().Contains(str))
-            //                tracks.Add(track);
-            //        }
-            //    }
-            //}
-
-            //listBoxSearchArtist.ItemsSource = artists;
-            //listBoxSearchAlbum.ItemsSource = albums;
-            //listBoxSearchTrack.ItemsSource = tracks;
-            return null;
-        }
-
+                
         private void appbar_buttonSettings_Click(object sender, EventArgs e)
         {
             NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
@@ -246,5 +194,54 @@ namespace MPDCWP
             }
         }
 
+
+        /// <summary>
+        /// PlayerControl play-handler
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event args</param>
+        public void playerControl_Play(object sender, CancelRoutedEventArgs e)
+        {
+            if (Playlist.Count == 0)
+            {
+                MessageBox.Show("No songs in playlist");
+                e.Cancel = true;
+            }
+            PlayerStatus = "Playing";
+        }
+
+                
+        /// <summary>
+        /// Finds tracks containing given term and return results as a IEnumerableList
+        /// </summary>
+        /// <param name="term">Search term</param>
+        /// <returns>Search results</returns>
+        public IEnumerable<Track> Find(string term)
+        {
+            //str = str.ToLower();
+            //List<Artist> artists = new List<Artist>();
+            //List<Track> tracks = new List<Track>();
+            //List<Album> albums = new List<Album>();
+            //foreach (Artist artist in Artists)
+            //{
+            //    if (artist.Name.ToLower().Contains(str))
+            //        artists.Add(artist);
+            //    foreach (Album album in artist.Albums)
+            //    {
+            //        if (album.Title.ToLower().Contains(str))
+            //            albums.Add(album);
+            //        foreach (Track track in album.Tracks)
+            //        {
+            //            if (track.Title.ToLower().Contains(str))
+            //                tracks.Add(track);
+            //        }
+            //    }
+            //}
+
+            //listBoxSearchArtist.ItemsSource = artists;
+            //listBoxSearchAlbum.ItemsSource = albums;
+            //listBoxSearchTrack.ItemsSource = tracks;
+            return null;
+        }
     }
 }
