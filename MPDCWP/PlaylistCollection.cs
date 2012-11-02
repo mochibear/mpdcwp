@@ -33,8 +33,15 @@ using System.Collections.ObjectModel;
 
 namespace MPDCWP
 {
+    /// <summary>
+    /// PlaylistCollection
+    /// inherits ObsarvableCollection
+    /// </summary>
     public class PlaylistCollection : ObservableCollection<Track>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public PlaylistCollection()
             : base()
         {

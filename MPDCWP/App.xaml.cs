@@ -36,17 +36,33 @@ using System.Windows.Controls;
 
 namespace MPDCWP
 {
+    /// <summary>
+    /// App class
+    /// Inherits Application    
+    /// </summary>
     public partial class App : Application
     {
         private List<Artist> artists = new List<Artist>();
         private Artist selectedArtist;
 
+
+        /// <summary>
+        /// Selected artist
+        /// </summary>
         public Artist SelectedArtist { get { return this.selectedArtist; } set { this.selectedArtist = value; } }
 
+
+        /// <summary>
+        /// Artists
+        /// </summary>
         public List<Artist> Artists { get { return this.artists; } set { this.artists = value; } }
 
         private PlaylistCollection playlist = new PlaylistCollection();
 
+
+        /// <summary>
+        /// Playlist
+        /// </summary>
         public PlaylistCollection Playlist
         {
             get { return playlist; }

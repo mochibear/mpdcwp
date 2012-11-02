@@ -33,15 +33,31 @@ using System.Collections.Generic;
 
 namespace MPDCWP
 {
+    /// <summary>
+    /// Album class
+    /// </summary>
     public class Album
     {
         private string title;
-        public string Title { get { return title; } set { this.title = value; } }
-
         private List<Track> tracks = new List<Track>();
 
+        
+        /// <summary>
+        /// Title of the album
+        /// </summary>
+        public string Title { get { return title; } set { this.title = value; } }
+                
+
+        /// <summary>
+        /// List of tracks
+        /// </summary>
         public List<Track> Tracks { get { return this.tracks; } set { this.tracks = value; } }
 
+
+        /// <summary>
+        /// Album as a string
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return Title;

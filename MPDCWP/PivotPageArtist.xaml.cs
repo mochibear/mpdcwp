@@ -34,10 +34,22 @@ using Microsoft.Phone.Controls;
 
 namespace MPDCWP
 {
+    /// <summary>
+    /// PivoPageArtist class
+    /// Inherits PhoneApplicationPage
+    /// All info about selected artist
+    /// </summary>
     public partial class PivotPageArtist : PhoneApplicationPage
     {
+        /// <summary>
+        /// Selected artist
+        /// </summary>
         public Artist SelectedArtist { get { return (Application.Current as App).SelectedArtist; } set { (Application.Current as App).SelectedArtist = value; } }
 
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public PivotPageArtist()
         {
             if (SelectedArtist == null)
@@ -47,7 +59,8 @@ namespace MPDCWP
             Loaded += new RoutedEventHandler(PivotPageArtist_Loaded);
         }
 
-        void PivotPageArtist_Loaded(object sender, RoutedEventArgs e)
+
+        private void PivotPageArtist_Loaded(object sender, RoutedEventArgs e)
         {
             listBoxAlbums.ItemsSource = SelectedArtist.Albums;
             listBoxTracks.ItemsSource = SelectedArtist.GetAllTracks();

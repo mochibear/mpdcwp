@@ -32,10 +32,17 @@ using System.Windows.Shapes;
 
 namespace MPDCWP
 {
+    /// <summary>
+    /// Track class
+    /// </summary>
     public class Track
     {
         private int number;
 
+
+        /// <summary>
+        /// Track number
+        /// </summary>
         public int Number
         {
             get { return number; }
@@ -43,6 +50,11 @@ namespace MPDCWP
         }        
 
         private string title;
+
+
+        /// <summary>
+        /// Track title
+        /// </summary>
         public string Title { get { return title; } set { this.title = value; } }
 
         public override string ToString()
@@ -50,6 +62,10 @@ namespace MPDCWP
             return Title;
         }
 
+
+        /// <summary>
+        /// Track artist
+        /// </summary>
         private string artist;
 
         public string Artist
@@ -60,6 +76,10 @@ namespace MPDCWP
 
         private string album;
 
+
+        /// <summary>
+        /// Track album
+        /// </summary>
         public string Album
         {
             get { return album; }

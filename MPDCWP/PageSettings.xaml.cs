@@ -34,8 +34,16 @@ using Microsoft.Phone.Controls;
 
 namespace MPDCWP
 {
+    /// <summary>
+    /// PageSettings class
+    /// Inherits PhoneApplicationPage
+    /// Application settings
+    /// </summary>
     public partial class PageSettings : PhoneApplicationPage
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public PageSettings()
         {
             InitializeComponent();

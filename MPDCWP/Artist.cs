@@ -33,21 +33,42 @@ using System.Collections.Generic;
 
 namespace MPDCWP
 {
+    /// <summary>
+    /// Artist class
+    /// </summary>
     public class Artist
     {
         private string name;
-        public string Name { get { return name; } set { this.name = value; } }
-
         private List<Album> albums = new List<Album>();
 
+
+        /// <summary>
+        /// Name of the artist
+        /// </summary>
+        public string Name { get { return name; } set { this.name = value; } }
+             
+
+        /// <summary>
+        /// Albums of the artist
+        /// </summary>
         public List<Album> Albums { get { return this.albums; } set { this.albums = value; } }
 
-        internal System.Collections.IEnumerable GetAllTracks()
-        {            
+
+        /// <summary>
+        /// Returns all tracks in all albums a IEnumerable
+        /// </summary>
+        /// <returns>All tracks</returns>
+        public System.Collections.IEnumerable GetAllTracks()
+        {
             return GetAllTracksAsList();
         }
 
-        internal List<Track> GetAllTracksAsList()
+
+        /// <summary>
+        /// Returns all tracks in all albums as a list
+        /// </summary>
+        /// <returns></returns>
+        public List<Track> GetAllTracksAsList()
         {
             List<Track> tracks = new List<Track>();
             foreach (Album album in albums)

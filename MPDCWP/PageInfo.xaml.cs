@@ -34,8 +34,16 @@ using Microsoft.Phone.Controls;
 
 namespace MPDCWP
 {
+    /// <summary>
+    /// PageInfo class
+    /// Inherits PhoneApplicationPage
+    /// Application info
+    /// </summary>
     public partial class PageInfo : PhoneApplicationPage
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public PageInfo()
         {
             InitializeComponent();

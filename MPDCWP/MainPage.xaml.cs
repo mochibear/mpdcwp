@@ -35,26 +35,56 @@ using MusicPlayerLibrary;
 
 namespace MPDCWP
 {
+    /// <summary>
+    /// MainPage class
+    /// Inherits PhoneApplicationPage
+    /// </summary>
     public partial class MainPage : PhoneApplicationPage
     {
+        /// <summary>
+        /// Playlist
+        /// </summary>
         public PlaylistCollection Playlist
         {
             get { return (Application.Current as App).Playlist; }
             set { (Application.Current as App).Playlist = value; }
         }
         
+        
+        /// <summary>
+        /// Status of the player
+        /// </summary>
         public string PlayerStatus { get { return textBlockStatus.Text; } set { textBlockStatus.Text = value; } }
+
+
+        /// <summary>
+        /// All artists
+        /// </summary>
         public List<Artist> Artists { get { return (Application.Current as App).Artists; } set { (Application.Current as App).Artists = value; } }
+
+
+        /// <summary>
+        /// Selected artist
+        /// </summary>
         public Artist SelectedArtist { get { return (Application.Current as App).SelectedArtist; } set { (Application.Current as App).SelectedArtist = value; } }
 
+
+        /// <summary>
+        /// tmp
+        /// </summary>
         private string imageSourceUrl = "http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=";
 
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public MainPage()
         {
             InitializeComponent();
             listBoxPlaylist.ItemsSource = Playlist;
             this.Loaded += new RoutedEventHandler(MainPage_Loaded);
         }
+
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -63,6 +93,7 @@ namespace MPDCWP
             listBoxSearch.ItemsSource = Artists;
             imageDownloader1.ImagePageUrl = imageSourceUrl + "anathema+weather+systems";
         }
+
 
         private void AddDemoData()
         {
@@ -77,6 +108,12 @@ namespace MPDCWP
             }
         }
 
+
+        /// <summary>
+        /// PlayerControl play-handler
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event args</param>
         public void playerControl_Play(object sender, CancelRoutedEventArgs e)
         {
             if (Playlist.Count == 0)
@@ -137,7 +174,13 @@ namespace MPDCWP
             //this.Find(textBoxSearch.Text);
         }
 
-        public void Find(string str)
+
+        /// <summary>
+        /// Finds tracks containing given term and return results as a IEnumerableList
+        /// </summary>
+        /// <param name="term">Search term</param>
+        /// <returns>Search results</returns>
+        public IEnumerable<Track> Find(string term)
         {
             //str = str.ToLower();
             //List<Artist> artists = new List<Artist>();
@@ -162,6 +205,7 @@ namespace MPDCWP
             //listBoxSearchArtist.ItemsSource = artists;
             //listBoxSearchAlbum.ItemsSource = albums;
             //listBoxSearchTrack.ItemsSource = tracks;
+            return null;
         }
 
         private void appbar_buttonSettings_Click(object sender, EventArgs e)
