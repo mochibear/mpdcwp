@@ -37,6 +37,7 @@ using Microsoft.Phone.Controls;
 using MusicPlayerLibrary;
 using MPDConnectLibrary;
 using System.IO.IsolatedStorage;
+using Microsoft.Phone.Shell;
 
 namespace MPDCWP
 {
@@ -46,11 +47,17 @@ namespace MPDCWP
     /// </summary>
     public partial class MainPage : PhoneApplicationPage
     {
-        // Page loaded
-        private bool loaded;
+        // Page loaded, something is being loaded
+        private bool loaded, loading;
 
 
-        // Connection to the server
+        // Progressbar
+        private ProgressIndicator progressIndicator;
+
+
+        /// <summary>
+        /// Server connection socket
+        /// </summary>
         public MPDClient Connection
         {
             get { return (Application.Current as App).Connection; }
@@ -100,6 +107,13 @@ namespace MPDCWP
             InitializeComponent();
             listBoxPlaylist.ItemsSource = Playlist;
             this.Loaded += new RoutedEventHandler(MainPage_Loaded);
+            SystemTray.SetIsVisible(this, false);
+            SystemTray.SetOpacity(this, 0.5);
+            progressIndicator = new ProgressIndicator();
+            progressIndicator.IsVisible = false;
+            progressIndicator.IsIndeterminate = true;
+            progressIndicator.Text = "Loading...";
+            SystemTray.SetProgressIndicator(this, progressIndicator);
         }
 
 
@@ -129,14 +143,31 @@ namespace MPDCWP
             if (!Connection.IsConnected && (!IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect") || !(bool)IsolatedStorageSettings.ApplicationSettings["autoconnect"]))
                 NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
             else
+            {
+                this.Loading(true, "Connecting to server...");
                 this.Connection.Connect();
+            }
             this.loaded = true;
+        }
+
+
+        // Loading indicator
+        private void Loading(bool loading, string text = "Loading...")
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                this.loading = loading;
+                progressIndicator.Text = text;
+                SystemTray.SetIsVisible(this, loading);
+                progressIndicator.IsVisible = loading;
+            });
         }
 
 
         // If connection fails
         private void Connection_CreateConnectionFailed(object sender, CreateConnectionAsyncArgs e)
         {
+            this.Loading(false);
             MessageBox.Show("Connection failed: " + e.Message);
         }
 
@@ -144,7 +175,11 @@ namespace MPDCWP
         // If connection is success
         private void Connection_CreateConnectionCompleted(object sender, CreateConnectionAsyncArgs e)
         {
-            PlayerStatus = "Connection established to " + Connection.Server;
+            this.Loading(false);
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                PlayerStatus = "Connection established to " + Connection.Server;
+            });
         }
 
 
@@ -314,7 +349,7 @@ namespace MPDCWP
             Connection.SendCommand(MPDClient.PLAY);
         }
 
-        
+
         /// <summary>
         /// Finds tracks containing given term and return results as a IEnumerableList
         /// </summary>

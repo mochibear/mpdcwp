@@ -93,15 +93,18 @@ namespace MPDCWP
 
 
         // If connection is established we can go back to the main page
-        void Connection_CreateConnectionCompleted(object sender, MPDConnectLibrary.CreateConnectionAsyncArgs e)
+        private void Connection_CreateConnectionCompleted(object sender, MPDConnectLibrary.CreateConnectionAsyncArgs e)
         {
             if (NavigationService.CanGoBack)
                 NavigationService.GoBack();
         }
 
 
-        // Leaving the page
-        // Saving settings if changed
+        /// <summary>
+        /// Leaving the page
+        /// Saving settings if changed
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             if (loaded && valuesChanged)
@@ -145,6 +148,7 @@ namespace MPDCWP
                 else if ((bool)checkBoxSavePassword.IsChecked)
                     IsolatedStorageSettings.ApplicationSettings.Add("password", textBoxPort.Text);
             }
+            base.OnNavigatingFrom(e);
         }
 
 
