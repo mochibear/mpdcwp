@@ -28,8 +28,8 @@ namespace MPDConnectLibrary
 {
     public class NextEventArgs : EventArgs
     {
-        public string Command;
-        public string[] Attributes;
+        public string Command { get; private set; }
+        public string[] Attributes { get; private set; }
 
         public NextEventArgs(string command, string[] attributes)
         {

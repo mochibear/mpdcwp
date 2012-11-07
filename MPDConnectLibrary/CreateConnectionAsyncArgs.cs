@@ -29,10 +29,12 @@ namespace MPDConnectLibrary
     public class CreateConnectionAsyncArgs : EventArgs
     {
         public bool ConnectionEstablished { get; private set; }
+        public string Message { get; private set; }
 
-        public CreateConnectionAsyncArgs(bool connectionEstablished)
+        public CreateConnectionAsyncArgs(bool connectionEstablished, string message)
         {
             ConnectionEstablished = connectionEstablished;
+            this.Message = message;
         }
     }
 }

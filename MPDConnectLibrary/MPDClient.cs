@@ -62,6 +62,8 @@ namespace MPDConnectLibrary
 
         public event EventHandler<CreateConnectionAsyncArgs> CreateConnectionCompleted;
 
+        public event EventHandler<CreateConnectionAsyncArgs> CreateConnectionFailed;
+
         private Socket connection;
 
         private string server;
@@ -123,18 +125,19 @@ namespace MPDConnectLibrary
         {
             if (e.SocketError != SocketError.Success)
             {
-                if (CreateConnectionCompleted != null)
-                    CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(false));
-                if (NextEventToPorform != null && nextArgs != null)
-                {
-                    NextEventToPorform(this, nextArgs);
-                    this.NextEventToPorform = null;
-                }
+                if (CreateConnectionFailed != null)
+                    CreateConnectionFailed(this, new CreateConnectionAsyncArgs(false, e.SocketError.ToString()));
+
                 return;
             }
 
             if (CreateConnectionCompleted != null)
-                CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(true));
+                CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(true, "Success"));
+            if (NextEventToPorform != null && nextArgs != null)
+            {
+                NextEventToPorform(this, nextArgs);
+                this.NextEventToPorform = null;
+            }
         }
 
         

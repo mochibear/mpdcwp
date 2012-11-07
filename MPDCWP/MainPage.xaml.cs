@@ -19,7 +19,6 @@
  * along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 
- * TODO Autoconnect-täppä
  * TODO Status/State mukaan, onko soitto päällä vai ei
  * 
  */
@@ -47,15 +46,18 @@ namespace MPDCWP
     /// </summary>
     public partial class MainPage : PhoneApplicationPage
     {
+        // Page loaded
         private bool loaded;
 
+
+        // Connection to the server
         public MPDClient Connection
         {
             get { return (Application.Current as App).Connection; }
             set { (Application.Current as App).Connection = value; }
         }
 
-        
+
         /// <summary>
         /// Playlist
         /// </summary>
@@ -64,8 +66,8 @@ namespace MPDCWP
             get { return (Application.Current as App).Playlist; }
             set { (Application.Current as App).Playlist = value; }
         }
-        
-        
+
+
         /// <summary>
         /// Status of the player
         /// </summary>
@@ -99,9 +101,14 @@ namespace MPDCWP
             listBoxPlaylist.ItemsSource = Playlist;
             this.Loaded += new RoutedEventHandler(MainPage_Loaded);
         }
-        
+
+
+        // Page loaded
+        // Load settings
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
+            if (loaded)
+                return;
             this.AddDemoData();
             listBoxBrowse.ItemsSource = Artists;
             listBoxSearch.ItemsSource = Artists;
@@ -117,11 +124,27 @@ namespace MPDCWP
                 this.Connection.Server = (string)IsolatedStorageSettings.ApplicationSettings["server"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
                 this.Connection.Port = (int)IsolatedStorageSettings.ApplicationSettings["port"];
-
+            this.Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
+            this.Connection.CreateConnectionFailed += Connection_CreateConnectionFailed;
             if (!Connection.IsConnected && (!IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect") || !(bool)IsolatedStorageSettings.ApplicationSettings["autoconnect"]))
                 NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
+            else
+                this.Connection.Connect();
+            this.loaded = true;
         }
-        
+
+        void Connection_CreateConnectionFailed(object sender, CreateConnectionAsyncArgs e)
+        {
+            MessageBox.Show("Connection failed: " + e.Message);
+        }
+
+        void Connection_CreateConnectionCompleted(object sender, CreateConnectionAsyncArgs e)
+        {
+            PlayerStatus = "Connection established to " + Connection.Server;
+        }
+
+
+        // Add demo data
         private void AddDemoData()
         {
             string[] names = new string[] { "Anathema", "Eva & Manu", "In flames", "Opeth", "Pain", "Porcupine Tree", "Storm Corrosion", "Soilwork" };
@@ -134,7 +157,9 @@ namespace MPDCWP
                 Artists.Add(artist);
             }
         }
-        
+
+
+        // 
         private void playerControl_Pause(object sender, EventArgs e)
         {
             Connection.SendCommand(MPDClient.PAUSE);
@@ -189,7 +214,7 @@ namespace MPDCWP
             // TODO Tee viive, ennen kuin käynnistetään haku tai sitten haun keskeytys
             //this.Find(textBoxSearch.Text);
         }
-                
+
         private void appbar_buttonSettings_Click(object sender, EventArgs e)
         {
             NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
@@ -257,7 +282,7 @@ namespace MPDCWP
         }
 
 
-                
+
         /// <summary>
         /// Finds tracks containing given term and return results as a IEnumerableList
         /// </summary>

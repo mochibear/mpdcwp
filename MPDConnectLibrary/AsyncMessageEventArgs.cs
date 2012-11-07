@@ -28,7 +28,7 @@ namespace MPDConnectLibrary
 {
     public class AsyncMessageEventArgs : EventArgs
     {
-        public string Message;
+        public string Message { get; private set; }
 
         public AsyncMessageEventArgs(string message)
         {

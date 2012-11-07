@@ -31,16 +31,23 @@ namespace MusicPlayerLibrary
     /// </summary>
     public class CancelRoutedEventArgs : RoutedEventArgs
     {
+        // Cancel event
+        private bool cancel;
+
         /// <summary>
         /// Event cancelled
-        /// </summary>
-        public bool Cancel = false;
-
-
+        /// </summary>        
+        public bool Cancel
+        {
+            get { return cancel; }
+            set { cancel = value; }
+        }
+        
+        
         /// <summary>
         /// Event message
         /// </summary>
-        public string Message;
+        public string Message { get; private set; }
 
 
         /// <summary>
