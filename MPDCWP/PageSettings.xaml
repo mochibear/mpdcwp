@@ -182,7 +182,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
 
             <TextBlock Name="textBlockPassword" Text="Password" Grid.Row="4" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="83" />
             <TextBox Name="textBoxPassword" Text="" Width="456" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource TextBoxStyleSettings}" />
-            <CheckBox Content="Save password" Grid.Row="6" Height="72" HorizontalAlignment="Left"  Name="checkBoxSavePassword" VerticalAlignment="Top" Width="258" Grid.RowSpan="2" />
+            <CheckBox Content="Save password" Grid.Row="6" Height="72" HorizontalAlignment="Left"  Name="checkBoxSavePassword" VerticalAlignment="Top" Width="258" Grid.RowSpan="2" Checked="checkBoxSavePassword_Checked" />
             <CheckBox Content="Auto connect" Grid.Row="7" Height="72" HorizontalAlignment="Left"  Name="checkBoxAutoConnect" VerticalAlignment="Top" Width="258" Grid.RowSpan="2"/>
             <Button x:Name="buttonConnect" Content="Connect" HorizontalAlignment="Left" Margin="10,70,0,0" Grid.Row="8" VerticalAlignment="Top" Click="buttonConnect_Click"/>
         </Grid>

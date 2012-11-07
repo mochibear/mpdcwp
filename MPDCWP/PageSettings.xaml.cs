@@ -21,6 +21,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Net;
 using System.Windows;
@@ -54,6 +55,22 @@ namespace MPDCWP
             if (!textBlockServer.Text.Equals("") && !textBlockPort.Text.Equals(""))
                 (Application.Current as App).Connection.Connect();
             
+        }
+
+        private void checkBoxSavePassword_Checked(object sender, RoutedEventArgs e)
+        {
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("savepassword"))
+                IsolatedStorageSettings.ApplicationSettings["savepassword"] = true;
+            else
+                IsolatedStorageSettings.ApplicationSettings.Add("savepassword", true);
+        }
+
+        private void checkBoxSavePassword_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("savepassword"))
+                IsolatedStorageSettings.ApplicationSettings["savepassword"] = false;
+            else
+                IsolatedStorageSettings.ApplicationSettings.Add("savepassword", false);
         }
     }
 }

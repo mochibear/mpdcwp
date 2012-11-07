@@ -16,6 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * 
+ * TODO status-komennolla state
+ * 
  */
 using System;
 using System.Net;
@@ -43,6 +46,8 @@ namespace MPDConnectLibrary
         public static string SEEK = "seek";
 
         public event EventHandler<NextEventArgs> NextEventToPorform;
+
+        public event EventHandler<AsyncMessageEventArgs> MessageReceived;
 
         private NextEventArgs nextArgs;
 
@@ -103,6 +108,8 @@ namespace MPDConnectLibrary
 
         public void Connect(string serverAddress, int port)
         {
+            if (this.IsConnected)
+                return;
             this.connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             var connectionOperation = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(serverAddress, port) };
@@ -128,11 +135,15 @@ namespace MPDConnectLibrary
                 CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(true));
         }
 
-
-
+        
         public void Disconnect()
         {
             this.connection.Close();
+        }
+
+        public void SendCommand(string command, string singleAttribute)
+        {
+            this.SendCommand(command, new string[] { singleAttribute });
         }
 
         public void SendCommand(string command, string[] attributes = null)
@@ -152,6 +163,7 @@ namespace MPDConnectLibrary
                 var asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.address, this.port) };
 
                 var buffer = Encoding.UTF8.GetBytes(sb.ToString() + Environment.NewLine);
+                asyncEvent.Completed += asyncEvent_Completed;
                 asyncEvent.SetBuffer(buffer, 0, buffer.Length);
                 connection.SendAsync(asyncEvent);
             }
@@ -163,9 +175,22 @@ namespace MPDConnectLibrary
             }
         }
 
+        void asyncEvent_Completed(object sender, SocketAsyncEventArgs e)
+        {
+            if (MessageReceived != null)
+            {
+                MessageReceived(this, new AsyncMessageEventArgs(Encoding.UTF8.GetString(e.Buffer, 0, e.BytesTransferred)));
+            }
+        }
+
         void MPDClient_NextEventToPorform(object sender, NextEventArgs e)
         {
             this.SendCommand(e.Command, e.Attributes);
+        }
+
+        public string GetStatus(string key)
+        {
+            return "pause"; // testidata
         }
         
     }

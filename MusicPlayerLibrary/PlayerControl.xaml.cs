@@ -39,6 +39,9 @@ namespace MusicPlayerLibrary
     /// </summary>
     public partial class PlayerControl : UserControl
     {
+
+        public bool Playing { get { return this.playing; } }
+
         private bool playing = false, hold = false;
 
         /// <summary>

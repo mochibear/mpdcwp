@@ -46,9 +46,6 @@ namespace MPDCWP
     /// </summary>
     public partial class MainPage : PhoneApplicationPage
     {
-
-        private IsolatedStorageSettings settings = IsolatedStorageSettings.ApplicationSettings;
-
         public MPDClient Connection
         {
             get { return (Application.Current as App).Connection; }
@@ -106,7 +103,7 @@ namespace MPDCWP
             listBoxBrowse.ItemsSource = Artists;
             listBoxSearch.ItemsSource = Artists;
             imageDownloader1.ImagePageUrl = imageSourceUrl + "anathema+weather+systems";
-            if (!settings.Contains("autoconnect") || !(bool)settings["autoconnect"])
+            if (!Connection.IsConnected && (!IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect") || !(bool)IsolatedStorageSettings.ApplicationSettings["autoconnect"]))
                 NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
         }
         
@@ -125,11 +122,13 @@ namespace MPDCWP
         
         private void playerControl_Pause(object sender, EventArgs e)
         {
+            Connection.SendCommand(MPDClient.PAUSE);
             PlayerStatus = "Paused";
         }
 
         private void playerControl_Previous(object sender, EventArgs e)
         {
+            Connection.SendCommand(MPDClient.PREVIOUS);
             PlayerStatus = "Previous";
         }
 
@@ -140,11 +139,13 @@ namespace MPDCWP
 
         private void playerControl_Stop(object sender, EventArgs e)
         {
+            Connection.SendCommand(MPDClient.STOP);
             PlayerStatus = "Stopped";
         }
 
         private void playerControl_Next(object sender, EventArgs e)
         {
+            Connection.SendCommand(MPDClient.NEXT);
             PlayerStatus = "Next";
         }
 
@@ -155,6 +156,7 @@ namespace MPDCWP
 
         private void playerControl_VolumeChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            Connection.SendCommand(MPDClient.SETVOL, e.NewValue + "");
             PlayerStatus = "VolumeChanged: " + e.NewValue;
         }
 
@@ -226,14 +228,10 @@ namespace MPDCWP
             }
             else
             {
-                //if (!Connection.IsConnected)
-                //{
-                //    Connection.NextArgs = new NextEventArgs(MPDClient.PLAY);
-                //    Connection.NextEventToPorform += mpdclient_nextEventToPorform;
-                //    Connection.Connect();
-                //}
-                //else
-                Connection.SendCommand(MPDClient.PLAY);
+                if (this.playerControl.Playing)
+                    Connection.SendCommand(MPDClient.PAUSE);
+                else
+                    Connection.SendCommand(MPDClient.PLAY);
                 PlayerStatus = "Playing";
             }
         }
