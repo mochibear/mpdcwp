@@ -1,6 +1,6 @@
 ﻿/*
  * MPDCWP - MPD Client for Windows Phone 7
- * (c) Matti Ahinko
+ * (c) Matti Ahinko 2012
  * matti.m.ahinko@student.jyu.fi
  * 
  * This file is part of MPDCWP.
@@ -20,6 +20,7 @@
  *
  * 
  * TODO Autoconnect-täppä
+ * TODO Status/State mukaan, onko soitto päällä vai ei
  * 
  */
 using System;
@@ -46,6 +47,8 @@ namespace MPDCWP
     /// </summary>
     public partial class MainPage : PhoneApplicationPage
     {
+        private bool loaded;
+
         public MPDClient Connection
         {
             get { return (Application.Current as App).Connection; }
@@ -103,6 +106,18 @@ namespace MPDCWP
             listBoxBrowse.ItemsSource = Artists;
             listBoxSearch.ItemsSource = Artists;
             imageDownloader1.ImagePageUrl = imageSourceUrl + "anathema+weather+systems";
+
+            // TODO TryGetValue
+
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("username"))
+                this.Connection.Username = (string)IsolatedStorageSettings.ApplicationSettings["username"];
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("password"))
+                this.Connection.Password = (string)IsolatedStorageSettings.ApplicationSettings["password"];
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("server"))
+                this.Connection.Server = (string)IsolatedStorageSettings.ApplicationSettings["server"];
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
+                this.Connection.Port = (int)IsolatedStorageSettings.ApplicationSettings["port"];
+
             if (!Connection.IsConnected && (!IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect") || !(bool)IsolatedStorageSettings.ApplicationSettings["autoconnect"]))
                 NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
         }

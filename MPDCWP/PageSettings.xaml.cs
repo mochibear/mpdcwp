@@ -1,6 +1,6 @@
 ﻿/*
  * MPDCWP - MPD Client for Windows Phone 7
- * (c) Matti Ahinko
+ * (c) Matti Ahinko 2012
  * matti.m.ahinko@student.jyu.fi
  * 
  * This file is part of MPDCWP.
@@ -30,6 +30,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 
@@ -42,35 +43,157 @@ namespace MPDCWP
     /// </summary>
     public partial class PageSettings : PhoneApplicationPage
     {
+        private bool loaded = false, valuesChanged = false;
         /// <summary>
         /// Constructor
         /// </summary>
         public PageSettings()
         {
             InitializeComponent();
+            // TODO voisi toteuttaa TryGetValuella?
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("savepassword"))
+                checkBoxSavePassword.IsChecked = (bool)IsolatedStorageSettings.ApplicationSettings["savepassword"];
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect"))
+                checkBoxAutoConnect.IsChecked = (bool)IsolatedStorageSettings.ApplicationSettings["autoconnect"];
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("server"))
+                textBoxServer.Text = (string)IsolatedStorageSettings.ApplicationSettings["server"];
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
+                textBoxPort.Text = (int)IsolatedStorageSettings.ApplicationSettings["port"] + "";
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("username"))
+                textBoxUsername.Text = (string)IsolatedStorageSettings.ApplicationSettings["username"];
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("password"))
+                textBoxPassword.Text = (string)IsolatedStorageSettings.ApplicationSettings["password"];
         }
 
         private void buttonConnect_Click(object sender, RoutedEventArgs e)
         {
-            if (!textBlockServer.Text.Equals("") && !textBlockPort.Text.Equals(""))
+            if (!textBoxServer.Text.Equals("") && !textBoxPort.Text.Equals(""))
+            {
+                if (valuesChanged)
+                {
+                    (Application.Current as App).Connection.Username = textBoxUsername.Text;
+                    (Application.Current as App).Connection.Password = textBoxPassword.Text;
+                    (Application.Current as App).Connection.Server = textBoxServer.Text;
+                    int value;
+                    if (Int32.TryParse(textBoxPort.Text, out value))
+                        (Application.Current as App).Connection.Port = value;
+                }
+
+                (Application.Current as App).Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
                 (Application.Current as App).Connection.Connect();
-            
+            }            
+        }
+
+        void Connection_CreateConnectionCompleted(object sender, MPDConnectLibrary.CreateConnectionAsyncArgs e)
+        {
+            if (NavigationService.CanGoBack)
+                NavigationService.GoBack();
+        }
+
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            if (loaded && valuesChanged)
+            {
+                if (IsolatedStorageSettings.ApplicationSettings.Contains("savepassword"))
+                    IsolatedStorageSettings.ApplicationSettings["savepassword"] = checkBoxSavePassword.IsChecked;
+                else
+                    IsolatedStorageSettings.ApplicationSettings.Add("savepassword", checkBoxSavePassword.IsChecked);
+
+                if (IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect"))
+                    IsolatedStorageSettings.ApplicationSettings["autoconnect"] = checkBoxAutoConnect.IsChecked;
+                else
+                    IsolatedStorageSettings.ApplicationSettings.Add("autoconnect", checkBoxAutoConnect.IsChecked);
+
+                if (IsolatedStorageSettings.ApplicationSettings.Contains("server"))
+                    IsolatedStorageSettings.ApplicationSettings["server"] = textBoxServer.Text;
+                else
+                    IsolatedStorageSettings.ApplicationSettings.Add("server", textBoxServer.Text);
+
+                int value;
+                if (Int32.TryParse(textBoxPort.Text, out value))
+                {
+                    if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
+                        IsolatedStorageSettings.ApplicationSettings["port"] = value;
+                    else
+                        IsolatedStorageSettings.ApplicationSettings.Add("port", value);                    
+                }
+
+                if (IsolatedStorageSettings.ApplicationSettings.Contains("username"))
+                    IsolatedStorageSettings.ApplicationSettings["username"] = textBoxUsername.Text;
+                else
+                    IsolatedStorageSettings.ApplicationSettings.Add("username", textBoxUsername.Text);
+
+                if (IsolatedStorageSettings.ApplicationSettings.Contains("password"))
+                {
+                    if ((bool)checkBoxSavePassword.IsChecked)
+                        IsolatedStorageSettings.ApplicationSettings["password"] = textBoxPort.Text;
+                    else
+                        IsolatedStorageSettings.ApplicationSettings.Remove("password");
+                }
+                else if ((bool)checkBoxSavePassword.IsChecked)
+                    IsolatedStorageSettings.ApplicationSettings.Add("password", textBoxPort.Text);
+            }
         }
 
         private void checkBoxSavePassword_Checked(object sender, RoutedEventArgs e)
         {
-            if (IsolatedStorageSettings.ApplicationSettings.Contains("savepassword"))
-                IsolatedStorageSettings.ApplicationSettings["savepassword"] = true;
-            else
-                IsolatedStorageSettings.ApplicationSettings.Add("savepassword", true);
+            if (!loaded)
+                return;
+            this.valuesChanged = true;
         }
 
         private void checkBoxSavePassword_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (IsolatedStorageSettings.ApplicationSettings.Contains("savepassword"))
-                IsolatedStorageSettings.ApplicationSettings["savepassword"] = false;
-            else
-                IsolatedStorageSettings.ApplicationSettings.Add("savepassword", false);
+            if (!loaded)
+                return;
+            this.valuesChanged = true;
+        }
+
+        private void checkBoxAutoConnect_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!loaded)
+                return;
+            this.valuesChanged = true;
+        }
+
+        private void checkBoxAutoConnect_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!loaded)
+                return;
+            this.valuesChanged = true;
+        }
+
+        private void PhoneApplicationPage_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            this.loaded = true;
+        }
+
+        private void textBoxServer_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!loaded)
+                return;
+            this.valuesChanged = true;
+        }
+
+        private void textBoxPort_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!loaded)
+                return;
+            this.valuesChanged = true;
+        }
+
+        private void textBoxUsername_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!loaded)
+                return;
+            this.valuesChanged = true;
+        }
+
+        private void textBoxPassword_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!loaded)
+                return;
+            this.valuesChanged = true;
         }
     }
 }

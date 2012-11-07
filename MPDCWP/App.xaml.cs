@@ -1,6 +1,6 @@
 ﻿/*
  * MPDCWP - MPD Client for Windows Phone 7
- * (c) Matti Ahinko
+ * (c) Matti Ahinko 2012
  * matti.m.ahinko@student.jyu.fi
  * 
  * This file is part of MPDCWP.
@@ -55,7 +55,7 @@ namespace MPDCWP
         private List<Artist> artists = new List<Artist>();
         private Artist selectedArtist;
 
-        private MPDClient connection = new MPDClient() { Address = "10.1.3.10", Port = 6600 };
+        private MPDClient connection = new MPDClient();
 
         public MPDClient Connection
         {

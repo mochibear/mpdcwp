@@ -1,6 +1,6 @@
 ﻿/*
  * MPDClient
- * (c) Matti Ahinko
+ * (c) Matti Ahinko 2012
  * matti.m.ahinko@student.jyu.fi
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -64,12 +64,12 @@ namespace MPDConnectLibrary
 
         private Socket connection;
 
-        private string address;
+        private string server;
 
-        public string Address
+        public string Server
         {
-            get { return address; }
-            set { address = value; }
+            get { return server; }
+            set { server = value; }
         }
 
         private int port;
@@ -103,12 +103,12 @@ namespace MPDConnectLibrary
 
         public void Connect()
         {
-            this.Connect(this.address, this.port);
+            this.Connect(this.server, this.port);
         }
 
         public void Connect(string serverAddress, int port)
         {
-            if (this.IsConnected)
+            if (this.IsConnected || serverAddress == null)
                 return;
             this.connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -160,7 +160,7 @@ namespace MPDConnectLibrary
                         space = " ";
                     }
                 }
-                var asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.address, this.port) };
+                var asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.server, this.port) };
 
                 var buffer = Encoding.UTF8.GetBytes(sb.ToString() + Environment.NewLine);
                 asyncEvent.Completed += asyncEvent_Completed;

@@ -1,6 +1,6 @@
 ﻿/*
  * ImageDownloader
- * (c) Matti Ahinko
+ * (c) Matti Ahinko 2012
  * matti.m.ahinko@student.jyu.fi
  * 
  * This program is free software: you can redistribute it and/or modify

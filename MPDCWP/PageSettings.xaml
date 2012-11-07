@@ -34,7 +34,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     mc:Ignorable="d" d:DesignHeight="768" d:DesignWidth="480"
-    shell:SystemTray.IsVisible="True">
+    shell:SystemTray.IsVisible="True" Loaded="PhoneApplicationPage_Loaded_1">
     <phone:PhoneApplicationPage.Resources>
         <Style x:Key="TextBlockStyleSettingsTitle" TargetType="TextBlock">
             <!-- Height="30" Margin="15,0,0,0" HorizontalAlignment="Left"  VerticalAlignment="Top" -->
@@ -172,18 +172,18 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
                 <RowDefinition Height="149*"/>
             </Grid.RowDefinitions>
             <TextBlock Name="textBlockServer" Text="Server" Grid.Row="0" Grid.Column="0" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="55" />
-            <TextBox Name="textBoxServer" Text="" Width="314" Grid.Row="1" Style="{StaticResource TextBoxStyleSettings}" />
+            <TextBox Name="textBoxServer" Text="" Width="314" Grid.Row="1" Style="{StaticResource TextBoxStyleSettings}" TextChanged="textBoxServer_TextChanged" />
 
             <TextBlock Name="textBlockPort" Text="Port" Grid.Row="0" Grid.Column="1" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="37" />
-            <TextBox Name="textBoxPort" Text="" Width="142" Grid.Row="1" Grid.Column="1" Style="{StaticResource TextBoxStyleSettings}"  />
+            <TextBox Name="textBoxPort" Text="" Width="142" Grid.Row="1" Grid.Column="1" Style="{StaticResource TextBoxStyleSettings}" TextChanged="textBoxPort_TextChanged" InputScope="Number"  />
 
             <TextBlock Name="textBlockUsername" Text="Username" Grid.Row="2" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="89" />
-            <TextBox Name="textBoxUsername" Text="" Grid.Row="3" Width="456" Grid.ColumnSpan="2" Style="{StaticResource TextBoxStyleSettings}" />
+            <TextBox Name="textBoxUsername" Text="" Grid.Row="3" Width="456" Grid.ColumnSpan="2" Style="{StaticResource TextBoxStyleSettings}" TextChanged="textBoxUsername_TextChanged" />
 
             <TextBlock Name="textBlockPassword" Text="Password" Grid.Row="4" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="83" />
-            <TextBox Name="textBoxPassword" Text="" Width="456" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource TextBoxStyleSettings}" />
-            <CheckBox Content="Save password" Grid.Row="6" Height="72" HorizontalAlignment="Left"  Name="checkBoxSavePassword" VerticalAlignment="Top" Width="258" Grid.RowSpan="2" Checked="checkBoxSavePassword_Checked" />
-            <CheckBox Content="Auto connect" Grid.Row="7" Height="72" HorizontalAlignment="Left"  Name="checkBoxAutoConnect" VerticalAlignment="Top" Width="258" Grid.RowSpan="2"/>
+            <TextBox Name="textBoxPassword" Text="" Width="456" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource TextBoxStyleSettings}" TextChanged="textBoxPassword_TextChanged" InputScope="Password" />
+            <CheckBox Content="Save password" Grid.Row="6" Height="72" HorizontalAlignment="Left"  Name="checkBoxSavePassword" VerticalAlignment="Top" Width="258" Grid.RowSpan="2" Checked="checkBoxSavePassword_Checked" Unchecked="checkBoxSavePassword_Unchecked" />
+            <CheckBox Content="Auto connect" Grid.Row="7" Height="72" HorizontalAlignment="Left"  Name="checkBoxAutoConnect" VerticalAlignment="Top" Width="258" Grid.RowSpan="2" Checked="checkBoxAutoConnect_Checked" Unchecked="checkBoxAutoConnect_Unchecked"/>
             <Button x:Name="buttonConnect" Content="Connect" HorizontalAlignment="Left" Margin="10,70,0,0" Grid.Row="8" VerticalAlignment="Top" Click="buttonConnect_Click"/>
         </Grid>
     </Grid>

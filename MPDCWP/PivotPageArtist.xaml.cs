@@ -1,6 +1,6 @@
 ﻿/*
  * MPDCWP - MPD Client for Windows Phone 7
- * (c) Matti Ahinko
+ * (c) Matti Ahinko 2012
  * matti.m.ahinko@student.jyu.fi
  * 
  * This file is part of MPDCWP.
