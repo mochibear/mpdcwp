@@ -108,8 +108,10 @@ namespace MPDConnectLibrary
 
         public void Connect(string serverAddress, int port)
         {
-            if (this.IsConnected || serverAddress == null)
+            if (serverAddress == null)
                 return;
+            if (this.IsConnected)
+                this.Disconnect();
             this.connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             var connectionOperation = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(serverAddress, port) };

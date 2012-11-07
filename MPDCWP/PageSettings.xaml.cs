@@ -43,7 +43,10 @@ namespace MPDCWP
     /// </summary>
     public partial class PageSettings : PhoneApplicationPage
     {
+        // Page is loaded, Values changed
         private bool loaded = false, valuesChanged = false;
+
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -65,6 +68,10 @@ namespace MPDCWP
                 textBoxPassword.Text = (string)IsolatedStorageSettings.ApplicationSettings["password"];
         }
 
+
+        // Button connect clicked
+        // If values are changed use new values in connection
+        // Connect to the server
         private void buttonConnect_Click(object sender, RoutedEventArgs e)
         {
             if (!textBoxServer.Text.Equals("") && !textBoxPort.Text.Equals(""))
@@ -84,12 +91,17 @@ namespace MPDCWP
             }            
         }
 
+
+        // If connection is established we can go back to the main page
         void Connection_CreateConnectionCompleted(object sender, MPDConnectLibrary.CreateConnectionAsyncArgs e)
         {
             if (NavigationService.CanGoBack)
                 NavigationService.GoBack();
         }
 
+
+        // Leaving the page
+        // Saving settings if changed
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             if (loaded && valuesChanged)
@@ -135,6 +147,8 @@ namespace MPDCWP
             }
         }
 
+
+        // If save password checkbox checked
         private void checkBoxSavePassword_Checked(object sender, RoutedEventArgs e)
         {
             if (!loaded)
@@ -142,6 +156,8 @@ namespace MPDCWP
             this.valuesChanged = true;
         }
 
+
+        // If save password checkbox unchecked
         private void checkBoxSavePassword_Unchecked(object sender, RoutedEventArgs e)
         {
             if (!loaded)
@@ -149,6 +165,8 @@ namespace MPDCWP
             this.valuesChanged = true;
         }
 
+
+        // If auto connect checkbox checked
         private void checkBoxAutoConnect_Checked(object sender, RoutedEventArgs e)
         {
             if (!loaded)
@@ -156,6 +174,8 @@ namespace MPDCWP
             this.valuesChanged = true;
         }
 
+
+        // If auto connect checkbox unchecked
         private void checkBoxAutoConnect_Unchecked(object sender, RoutedEventArgs e)
         {
             if (!loaded)
@@ -163,11 +183,15 @@ namespace MPDCWP
             this.valuesChanged = true;
         }
 
+
+        // Page loaded
         private void PhoneApplicationPage_Loaded_1(object sender, RoutedEventArgs e)
         {
             this.loaded = true;
         }
 
+
+        // Server text changed
         private void textBoxServer_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (!loaded)
@@ -175,6 +199,8 @@ namespace MPDCWP
             this.valuesChanged = true;
         }
 
+
+        // Port text changed
         private void textBoxPort_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (!loaded)
@@ -182,6 +208,8 @@ namespace MPDCWP
             this.valuesChanged = true;
         }
 
+
+        // Username text changed
         private void textBoxUsername_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (!loaded)
@@ -189,6 +217,8 @@ namespace MPDCWP
             this.valuesChanged = true;
         }
 
+
+        // Password text changed
         private void textBoxPassword_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (!loaded)

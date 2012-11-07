@@ -37,7 +37,11 @@ namespace MPDCWP
     /// </summary>
     public class Track
     {
+        // ID, title, artist and album strings
         private string id, title, artist, album;
+
+
+        // Track number
         private int number;
 
 

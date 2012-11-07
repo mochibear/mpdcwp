@@ -60,12 +60,15 @@ namespace MPDCWP
         }
 
 
+        // Page loaded
         private void PivotPageArtist_Loaded(object sender, RoutedEventArgs e)
         {
             listBoxAlbums.ItemsSource = SelectedArtist.Albums;
             listBoxTracks.ItemsSource = SelectedArtist.GetAllTracks();
         }
 
+
+        // Go back, if possible
         private void GoBack()
         {
             SelectedArtist = null;
@@ -73,6 +76,8 @@ namespace MPDCWP
                 NavigationService.GoBack();
         }
 
+
+        // Selection of album changed
         private void listBoxAlbums_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Album album = (Album)listBoxAlbums.SelectedItem;
@@ -82,6 +87,11 @@ namespace MPDCWP
             pivotMain.SelectedItem = pivotItemTracks;
         }
 
+
+        // Context menu item clicked.
+        // If selection is a track, add it to the playlist.
+        // If it is an album add all tracks to the playlist
+        // If it is an artist add all tracks in all albums to the playlist (not possible in this situation)
         private void ContextMenuItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = sender as MenuItem;
