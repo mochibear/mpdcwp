@@ -133,12 +133,16 @@ namespace MPDCWP
             this.loaded = true;
         }
 
-        void Connection_CreateConnectionFailed(object sender, CreateConnectionAsyncArgs e)
+
+        // If connection fails
+        private void Connection_CreateConnectionFailed(object sender, CreateConnectionAsyncArgs e)
         {
             MessageBox.Show("Connection failed: " + e.Message);
         }
 
-        void Connection_CreateConnectionCompleted(object sender, CreateConnectionAsyncArgs e)
+
+        // If connection is success
+        private void Connection_CreateConnectionCompleted(object sender, CreateConnectionAsyncArgs e)
         {
             PlayerStatus = "Connection established to " + Connection.Server;
         }
@@ -159,47 +163,61 @@ namespace MPDCWP
         }
 
 
-        // 
+        // Player control pauses
         private void playerControl_Pause(object sender, EventArgs e)
         {
             Connection.SendCommand(MPDClient.PAUSE);
             PlayerStatus = "Paused";
         }
 
+
+        // Player control previous
         private void playerControl_Previous(object sender, EventArgs e)
         {
             Connection.SendCommand(MPDClient.PREVIOUS);
             PlayerStatus = "Previous";
         }
 
+
+        // Player control pauses
         private void playerControl_Rewind(object sender, EventArgs e)
         {
             PlayerStatus = "Rewind";
         }
 
+
+        // Player control stop
         private void playerControl_Stop(object sender, EventArgs e)
         {
             Connection.SendCommand(MPDClient.STOP);
             PlayerStatus = "Stopped";
         }
 
+
+        // Player control next
         private void playerControl_Next(object sender, EventArgs e)
         {
             Connection.SendCommand(MPDClient.NEXT);
             PlayerStatus = "Next";
         }
 
+
+        // Player control forward
         private void playerControl_Forward(object sender, EventArgs e)
         {
             PlayerStatus = "Forward";
         }
 
+
+        // Player control volume changed
         private void playerControl_VolumeChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Connection.SendCommand(MPDClient.SETVOL, e.NewValue + "");
             PlayerStatus = "VolumeChanged: " + e.NewValue;
         }
 
+
+        // Browse Selection changed
         private void listBoxBrowse_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Artist artist = (Artist)listBoxBrowse.SelectedItem;
@@ -209,22 +227,34 @@ namespace MPDCWP
             NavigationService.Navigate(new Uri("/PivotPageArtist.xaml", UriKind.Relative)); // voisi miettiä myös esim. id:n viemistä urlissa
         }
 
+
+        // Search textbox text changed
+        // Perform quick search
         private void textBoxSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
             // TODO Tee viive, ennen kuin käynnistetään haku tai sitten haun keskeytys
             //this.Find(textBoxSearch.Text);
         }
 
+
+        // Open settings
         private void appbar_buttonSettings_Click(object sender, EventArgs e)
         {
             NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
         }
 
+
+        // Open info
         private void appbar_buttonInfo_Click(object sender, EventArgs e)
         {
             NavigationService.Navigate(new Uri("/PageInfo.xaml", UriKind.Relative));
         }
 
+
+        // Context menu clicked
+        // If selection is a track, add it to the playlist.
+        // If it is an album add all tracks to the playlist
+        // If it is an artist add all tracks in all albums to the playlist
         private void ContextMenuItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = sender as MenuItem;
@@ -276,13 +306,15 @@ namespace MPDCWP
             }
         }
 
-        void mpdclient_nextEventToPorform(object sender, NextEventArgs e)
+
+        // If not connected, but needs to play
+        // After successfull connection this method is being called
+        private void mpdclient_nextEventToPorform(object sender, NextEventArgs e)
         {
             Connection.SendCommand(MPDClient.PLAY);
         }
 
-
-
+        
         /// <summary>
         /// Finds tracks containing given term and return results as a IEnumerableList
         /// </summary>

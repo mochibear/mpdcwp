@@ -38,7 +38,11 @@ namespace MPDCWP
     /// </summary>
     public class Artist
     {
+        // Artist name
         private string name;
+
+
+        // Albums
         private List<Album> albums = new List<Album>();
 
 

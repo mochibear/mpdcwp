@@ -52,19 +52,28 @@ namespace MPDCWP
     /// </summary>
     public partial class App : Application
     {
+        // Artists
         private List<Artist> artists = new List<Artist>();
+
+
+        // Selected artist
         private Artist selectedArtist;
 
+
+        // MPD Connection
         private MPDClient connection = new MPDClient();
 
+
+        /// <summary>
+        /// Connection to mpd server
+        /// </summary>
         public MPDClient Connection
         {
             get { return connection; }
             set { connection = value; }
         }
 
-
-
+        
         /// <summary>
         /// Selected artist
         /// </summary>
@@ -76,6 +85,8 @@ namespace MPDCWP
         /// </summary>
         public List<Artist> Artists { get { return this.artists; } set { this.artists = value; } }
 
+
+        // Playlist
         private PlaylistCollection playlist = new PlaylistCollection();
 
 

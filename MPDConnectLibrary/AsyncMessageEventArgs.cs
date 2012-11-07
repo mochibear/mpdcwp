@@ -26,10 +26,22 @@ using System.Text;
 
 namespace MPDConnectLibrary
 {
+    /// <summary>
+    /// Event args for asyng message
+    /// Inherits EventArgs
+    /// </summary>
     public class AsyncMessageEventArgs : EventArgs
     {
+        /// <summary>
+        /// Message
+        /// </summary>
         public string Message { get; private set; }
 
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="message">Message</param>
         public AsyncMessageEventArgs(string message)
         {
             this.Message = message;

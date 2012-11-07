@@ -26,11 +26,29 @@ using System.Text;
 
 namespace MPDConnectLibrary
 {
+    /// <summary>
+    /// Event args for next task
+    /// Inherits EventArgs
+    /// </summary>
     public class NextEventArgs : EventArgs
     {
+        /// <summary>
+        /// Command to pass along
+        /// </summary>
         public string Command { get; private set; }
+
+
+        /// <summary>
+        /// Attributes to pass along
+        /// </summary>
         public string[] Attributes { get; private set; }
 
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="command">Command</param>
+        /// <param name="attributes">Attributes</param>
         public NextEventArgs(string command, string[] attributes)
         {
             this.Command = command;

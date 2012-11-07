@@ -38,7 +38,11 @@ namespace MPDCWP
     /// </summary>
     public class Album
     {
+        // Album title
         private string title;
+
+
+        // Album tracks
         private List<Track> tracks = new List<Track>();
 
         

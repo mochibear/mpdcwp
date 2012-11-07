@@ -37,77 +37,169 @@ namespace MPDConnectLibrary
 {
     public class MPDClient
     {
-        public static string NEXT = "next";
-        public static string PREVIOUS = "previous";
-        public static string SETVOL = "setvol";
-        public static string STOP = "stop";
-        public static string PLAY = "play";
-        public static string PAUSE = "pause";
-        public static string SEEK = "seek";
-
-        public event EventHandler<NextEventArgs> NextEventToPorform;
-
-        public event EventHandler<AsyncMessageEventArgs> MessageReceived;
-
+        // Next task args (command)
         private NextEventArgs nextArgs;
 
+
+        // Connection socket
+        private Socket connection;
+
+
+        // Server address
+        private string server;
+
+
+        // Server port
+        private int port;
+
+
+        // Server username
+        private string username;
+
+
+        // Server password
+        private string password;
+
+
+        /// <summary>
+        /// Next command
+        /// </summary>
+        public static string NEXT = "next";
+
+
+        /// <summary>
+        /// Previous command
+        /// </summary>
+        public static string PREVIOUS = "previous";
+
+
+        /// <summary>
+        /// Set volume command
+        /// </summary>
+        public static string SETVOL = "setvol";
+
+
+        /// <summary>
+        /// Stop command
+        /// </summary>
+        public static string STOP = "stop";
+
+
+        /// <summary>
+        /// Play command
+        /// </summary>
+        public static string PLAY = "play";
+
+
+        /// <summary>
+        /// Pause command
+        /// </summary>
+        public static string PAUSE = "pause";
+
+
+        /// <summary>
+        /// Seek command
+        /// </summary>
+        public static string SEEK = "seek";
+
+
+        /// <summary>
+        /// Next task to perform after connection
+        /// </summary>
+        public event EventHandler<NextEventArgs> NextTaskToPorform;
+
+
+        /// <summary>
+        /// If message is received from server
+        /// </summary>
+        public event EventHandler<AsyncMessageEventArgs> MessageReceived;
+
+
+        /// <summary>
+        /// Next task args
+        /// </summary>        
         public NextEventArgs NextArgs
         {
             get { return nextArgs; }
             set { nextArgs = value; }
         }
         
-
-        //public event EventHandler CommandFailed;
-
+        
+        /// <summary>
+        /// Connection established
+        /// </summary>
         public event EventHandler<CreateConnectionAsyncArgs> CreateConnectionCompleted;
 
+
+        /// <summary>
+        /// Connection failed
+        /// </summary>
         public event EventHandler<CreateConnectionAsyncArgs> CreateConnectionFailed;
 
-        private Socket connection;
 
-        private string server;
-
+        /// <summary>
+        /// Server address
+        /// </summary>
         public string Server
         {
             get { return server; }
             set { server = value; }
         }
 
-        private int port;
-
+        
+        /// <summary>
+        /// Server port
+        /// </summary>
         public int Port
         {
             get { return port; }
             set { port = value; }
         }
 
-        private string username;
-
+        
+        /// <summary>
+        /// Server username
+        /// </summary>
         public string Username
         {
             get { return username; }
             set { username = value; }
         }
 
-        private string password;
-
+        
+        /// <summary>
+        /// Server password
+        /// </summary>
         public string Password
         {
             get { return password; }
             set { password = value; }
         }
 
+
+        /// <summary>
+        /// Is client connected to a server
+        /// </summary>
         public bool IsConnected
         {
             get { if (this.connection != null) return this.connection.Connected; else return false; }            
         }
 
+
+        /// <summary>
+        /// Connect to the server with predefined address and port
+        /// </summary>
         public void Connect()
         {
             this.Connect(this.server, this.port);
         }
 
+
+        /// <summary>
+        /// Connect to the server
+        /// </summary>
+        /// <param name="serverAddress">Server address</param>
+        /// <param name="port">Server port</param>
         public void Connect(string serverAddress, int port)
         {
             if (serverAddress == null)
@@ -121,6 +213,8 @@ namespace MPDConnectLibrary
             this.connection.ConnectAsync(connectionOperation);
         }
 
+
+        // Connection completed
         private void OnConnectionToServerCompleted(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError != SocketError.Success)
@@ -133,24 +227,40 @@ namespace MPDConnectLibrary
 
             if (CreateConnectionCompleted != null)
                 CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(true, "Success"));
-            if (NextEventToPorform != null && nextArgs != null)
+            if (NextTaskToPorform != null && nextArgs != null)
             {
-                NextEventToPorform(this, nextArgs);
-                this.NextEventToPorform = null;
+                NextTaskToPorform(this, nextArgs);
+                this.NextTaskToPorform = null;
             }
         }
 
         
+        /// <summary>
+        /// Disconnect
+        /// Close socket and release all associated resources
+        /// </summary>
         public void Disconnect()
         {
             this.connection.Close();
         }
 
+
+        /// <summary>
+        /// Send given command and a parameter to the server
+        /// </summary>
+        /// <param name="command">Command</param>
+        /// <param name="singleAttribute">Parameter</param>
         public void SendCommand(string command, string singleAttribute)
         {
             this.SendCommand(command, new string[] { singleAttribute });
         }
 
+
+        /// <summary>
+        /// Send given command and parameters to the server
+        /// </summary>
+        /// <param name="command">Command</param>
+        /// <param name="attributes">Attributes</param>
         public void SendCommand(string command, string[] attributes = null)
         {
             if (this.IsConnected)
@@ -175,12 +285,14 @@ namespace MPDConnectLibrary
             else
             {               
                 this.nextArgs = new NextEventArgs(command, attributes);
-                this.NextEventToPorform += MPDClient_NextEventToPorform;
+                this.NextTaskToPorform += MPDClient_NextTaskToPorform;
                 this.Connect();
             }
         }
 
-        void asyncEvent_Completed(object sender, SocketAsyncEventArgs e)
+
+        // Asynchronic command sending completed
+        private void asyncEvent_Completed(object sender, SocketAsyncEventArgs e)
         {
             if (MessageReceived != null)
             {
@@ -188,11 +300,20 @@ namespace MPDConnectLibrary
             }
         }
 
-        void MPDClient_NextEventToPorform(object sender, NextEventArgs e)
+
+        // Next task after successful connection
+        private void MPDClient_NextTaskToPorform(object sender, NextEventArgs e)
         {
             this.SendCommand(e.Command, e.Attributes);
         }
 
+
+        /// <summary>
+        /// Get status of mpd
+        /// Not implemented
+        /// </summary>
+        /// <param name="key">Status key</param>
+        /// <returns>Required info</returns>
         public string GetStatus(string key)
         {
             return "pause"; // testidata

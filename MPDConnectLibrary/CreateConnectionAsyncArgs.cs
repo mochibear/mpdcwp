@@ -26,11 +26,29 @@ using System.Text;
 
 namespace MPDConnectLibrary
 {
+    /// <summary>
+    /// Event args for async connection
+    /// Inherits EventArgs
+    /// </summary>
     public class CreateConnectionAsyncArgs : EventArgs
     {
+        /// <summary>
+        /// If connection was successful
+        /// </summary>
         public bool ConnectionEstablished { get; private set; }
+
+
+        /// <summary>
+        /// Message
+        /// </summary>
         public string Message { get; private set; }
 
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="connectionEstablished">Success</param>
+        /// <param name="message">Message</param>
         public CreateConnectionAsyncArgs(bool connectionEstablished, string message)
         {
             ConnectionEstablished = connectionEstablished;

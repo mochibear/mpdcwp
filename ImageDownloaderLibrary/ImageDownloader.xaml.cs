@@ -39,9 +39,19 @@ namespace ImageDownloaderLibrary
     /// </summary>
     public partial class ImageDownloader : UserControl
     {
+        // Webclients for image download and page parse
         private WebClient webClientGetImage, webClientPageToParse;
+
+
+        // Image source bitmap
         private BitmapImage imageSource;
+
+
+        // Is autodownload, autoload and autoparse enabled
         private bool autoDownload = true, autoLoad = true, autoParse = true;
+
+
+        // Url of image and page and keyword for parse
         private string imageUrl, keyWord, imagePageUrl;
 
 
@@ -215,6 +225,7 @@ namespace ImageDownloaderLibrary
         }
 
         
+        // Parse completed
         private void pageToParse_OpenReadCompleted(object sender, OpenReadCompletedEventArgs e)
         {
             bool found = false;
@@ -244,6 +255,7 @@ namespace ImageDownloaderLibrary
                 ImageUrlNotFound(this, new EventArgs());
         }
 
+
         /// <summary>
         /// Downloads and changes image of the control
         /// </summary>
@@ -259,6 +271,7 @@ namespace ImageDownloaderLibrary
         }
 
 
+        // Image download completed
         private void downloadImage_OpenReadCompleted(object sender, OpenReadCompletedEventArgs e)
         {
             if (e.Error == null && !e.Cancelled)
