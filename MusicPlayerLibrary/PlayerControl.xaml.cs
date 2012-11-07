@@ -39,10 +39,15 @@ namespace MusicPlayerLibrary
     /// </summary>
     public partial class PlayerControl : UserControl
     {
+        // If playing
+        private bool playing = false, hold = false;
 
+
+        /// <summary>
+        /// Is control in Playing mode
+        /// </summary>
         public bool Playing { get { return this.playing; } }
 
-        private bool playing = false, hold = false;
 
         /// <summary>
         /// Event if play is pressed
@@ -158,6 +163,8 @@ namespace MusicPlayerLibrary
         }
 
 
+        // Button play clicked
+        // Hide play and show pause
         private void buttonPlay_Click(object sender, RoutedEventArgs e)
         {
             if (Play != null)
@@ -172,6 +179,9 @@ namespace MusicPlayerLibrary
             buttonPause.Visibility = System.Windows.Visibility.Visible;
         }
 
+
+        // Button pause clicked
+        // Hide pause and show play
         private void buttonPause_Click(object sender, RoutedEventArgs e)
         {
             if (Pause != null)
@@ -180,6 +190,9 @@ namespace MusicPlayerLibrary
             buttonPause.Visibility = System.Windows.Visibility.Collapsed;
         }
 
+
+        // Button stop clicked
+        // Hide pause and show play
         private void buttonStop_Click(object sender, RoutedEventArgs e)
         {
             if (Stop != null)
@@ -189,6 +202,9 @@ namespace MusicPlayerLibrary
             buttonPause.Visibility = System.Windows.Visibility.Collapsed;
         }
 
+
+        // Button next clicked
+        // If button is being hold, do nothing
         private void buttonNext_Click(object sender, RoutedEventArgs e)
         {
             if (hold)
@@ -200,6 +216,9 @@ namespace MusicPlayerLibrary
                 Next(this, new EventArgs());
         }
 
+
+        // Button previous clicked
+        // If button is being hold, do nothing
         private void buttonPrevious_Click(object sender, RoutedEventArgs e)
         {
             if (hold)
@@ -211,6 +230,9 @@ namespace MusicPlayerLibrary
                 Previous(this, new EventArgs());
         }
 
+
+        // Button next is being pressed long time
+        // Perform forward, if playing a song
         private void buttonNext_Hold(object sender, GestureEventArgs e)
         {
             hold = true;
@@ -218,6 +240,9 @@ namespace MusicPlayerLibrary
                 Forward(this, new EventArgs());
         }
 
+
+        // Button previous is being pressed long time
+        // Perform rewind, if playing
         private void buttonPrevious_Hold(object sender, GestureEventArgs e)
         {
             hold = true;
@@ -225,6 +250,8 @@ namespace MusicPlayerLibrary
                 Rewind(this, new EventArgs());
         }
 
+
+        // Volume changed
         private void sliderVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (VolumeChanged != null)
