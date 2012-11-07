@@ -48,5 +48,12 @@ namespace MPDCWP
         {
             InitializeComponent();
         }
+
+        private void buttonConnect_Click(object sender, RoutedEventArgs e)
+        {
+            if (!textBlockServer.Text.Equals("") && !textBlockPort.Text.Equals(""))
+                (Application.Current as App).Connection.Connect();
+            
+        }
     }
 }

@@ -158,6 +158,10 @@
       <Project>{68075132-1DF7-4D52-A670-F1B11C1418B3}</Project>
       <Name>ImageDownloaderLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MPDConnectLibrary\MPDConnectLibrary.csproj">
+      <Project>{38EF3C1D-FE50-41AD-8040-E2056AC91820}</Project>
+      <Name>MPDConnectLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MusicPlayerLibrary\MusicPlayerLibrary.csproj">
       <Project>{93EB8C01-AE9D-4FB6-8BC2-F5DDB57D9428}</Project>
       <Name>MusicPlayerLibrary</Name>

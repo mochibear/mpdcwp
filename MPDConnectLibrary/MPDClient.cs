@@ -20,6 +20,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -40,6 +41,19 @@ namespace MPDConnectLibrary
         public static string PLAY = "play";
         public static string PAUSE = "pause";
         public static string SEEK = "seek";
+
+        public event EventHandler<NextEventArgs> NextEventToPorform;
+
+        private NextEventArgs nextArgs;
+
+        public NextEventArgs NextArgs
+        {
+            get { return nextArgs; }
+            set { nextArgs = value; }
+        }
+        
+
+        //public event EventHandler CommandFailed;
 
         public event EventHandler<CreateConnectionAsyncArgs> CreateConnectionCompleted;
 
@@ -77,28 +91,23 @@ namespace MPDConnectLibrary
             set { password = value; }
         }
 
-
-        private bool isConnected;
-
         public bool IsConnected
         {
-            get { return isConnected; }
-            set { isConnected = value; }
+            get { if (this.connection != null) return this.connection.Connected; else return false; }            
         }
 
-        public int Connect()
+        public void Connect()
         {
-            return this.Connect(this.address, this.port);
+            this.Connect(this.address, this.port);
         }
 
-        public int Connect(string serverAddress, int port)
+        public void Connect(string serverAddress, int port)
         {
             this.connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             var connectionOperation = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(serverAddress, port) };
-            connectionOperation.Completed += OnConnectionToServerCompleted;
+            connectionOperation.Completed += OnConnectionToServerCompleted;            
             this.connection.ConnectAsync(connectionOperation);
-            return 0;
         }
 
         private void OnConnectionToServerCompleted(object sender, SocketAsyncEventArgs e)
@@ -107,7 +116,11 @@ namespace MPDConnectLibrary
             {
                 if (CreateConnectionCompleted != null)
                     CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(false));
-
+                if (NextEventToPorform != null && nextArgs != null)
+                {
+                    NextEventToPorform(this, nextArgs);
+                    this.NextEventToPorform = null;
+                }
                 return;
             }
 
@@ -117,17 +130,43 @@ namespace MPDConnectLibrary
 
 
 
-        public int Disconnect()
+        public void Disconnect()
         {
-
-            return 0;
+            this.connection.Close();
         }
 
-        public int SendCommand(string command, string[] attributes)
+        public void SendCommand(string command, string[] attributes = null)
         {
-            return 0;
+            if (this.IsConnected)
+            {
+                StringBuilder sb = new StringBuilder(command);
+                if (attributes != null)
+                {
+                    string space = "";
+                    foreach (string attr in attributes)
+                    {
+                        sb.Append(space + attr);
+                        space = " ";
+                    }
+                }
+                var asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.address, this.port) };
+
+                var buffer = Encoding.UTF8.GetBytes(sb.ToString() + Environment.NewLine);
+                asyncEvent.SetBuffer(buffer, 0, buffer.Length);
+                connection.SendAsync(asyncEvent);
+            }
+            else
+            {               
+                this.nextArgs = new NextEventArgs(command, attributes);
+                this.NextEventToPorform += MPDClient_NextEventToPorform;
+                this.Connect();
+            }
         }
 
+        void MPDClient_NextEventToPorform(object sender, NextEventArgs e)
+        {
+            this.SendCommand(e.Command, e.Attributes);
+        }
         
     }
 }

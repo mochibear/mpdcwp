@@ -18,6 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * 
+ * TODO Autoconnect-täppä
+ * 
  */
 using System;
 using System.Collections.Generic;
@@ -32,6 +35,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using MusicPlayerLibrary;
+using MPDConnectLibrary;
+using System.IO.IsolatedStorage;
 
 namespace MPDCWP
 {
@@ -41,6 +46,16 @@ namespace MPDCWP
     /// </summary>
     public partial class MainPage : PhoneApplicationPage
     {
+
+        private IsolatedStorageSettings settings = IsolatedStorageSettings.ApplicationSettings;
+
+        public MPDClient Connection
+        {
+            get { return (Application.Current as App).Connection; }
+            set { (Application.Current as App).Connection = value; }
+        }
+
+        
         /// <summary>
         /// Playlist
         /// </summary>
@@ -91,6 +106,8 @@ namespace MPDCWP
             listBoxBrowse.ItemsSource = Artists;
             listBoxSearch.ItemsSource = Artists;
             imageDownloader1.ImagePageUrl = imageSourceUrl + "anathema+weather+systems";
+            if (!settings.Contains("autoconnect") || !(bool)settings["autoconnect"])
+                NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
         }
         
         private void AddDemoData()
@@ -207,8 +224,25 @@ namespace MPDCWP
                 MessageBox.Show("No songs in playlist");
                 e.Cancel = true;
             }
-            PlayerStatus = "Playing";
+            else
+            {
+                //if (!Connection.IsConnected)
+                //{
+                //    Connection.NextArgs = new NextEventArgs(MPDClient.PLAY);
+                //    Connection.NextEventToPorform += mpdclient_nextEventToPorform;
+                //    Connection.Connect();
+                //}
+                //else
+                Connection.SendCommand(MPDClient.PLAY);
+                PlayerStatus = "Playing";
+            }
         }
+
+        void mpdclient_nextEventToPorform(object sender, NextEventArgs e)
+        {
+            Connection.SendCommand(MPDClient.PLAY);
+        }
+
 
                 
         /// <summary>

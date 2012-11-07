@@ -42,6 +42,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using System.Windows;
 using System.Windows.Controls;
+using MPDConnectLibrary;
 
 namespace MPDCWP
 {
@@ -53,6 +54,15 @@ namespace MPDCWP
     {
         private List<Artist> artists = new List<Artist>();
         private Artist selectedArtist;
+
+        private MPDClient connection = new MPDClient() { Address = "10.1.3.10", Port = 6600 };
+
+        public MPDClient Connection
+        {
+            get { return connection; }
+            set { connection = value; }
+        }
+
 
 
         /// <summary>
