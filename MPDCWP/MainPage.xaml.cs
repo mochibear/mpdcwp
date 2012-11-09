@@ -123,7 +123,7 @@ namespace MPDCWP
         {
             if (loaded)
                 return;
-            this.AddDemoData();
+            //this.AddDemoData();
             listBoxBrowse.ItemsSource = Artists;
             listBoxSearch.ItemsSource = Artists;
             imageDownloader1.ImagePageUrl = imageSourceUrl + "anathema+weather+systems";
@@ -140,6 +140,7 @@ namespace MPDCWP
                 this.Connection.Port = (int)IsolatedStorageSettings.ApplicationSettings["port"];
             this.Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
             this.Connection.CreateConnectionFailed += Connection_CreateConnectionFailed;
+            // TODO Pitää tarkistaa, jotta jos tullaan pagesettingsistä, ei varmaan halutakaan yhdistää. Ehkä kysymys?
             if (!Connection.IsConnected && (!IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect") || !(bool)IsolatedStorageSettings.ApplicationSettings["autoconnect"]))
                 NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
             else
@@ -174,12 +175,21 @@ namespace MPDCWP
 
         // If connection is success
         private void Connection_CreateConnectionCompleted(object sender, CreateConnectionAsyncArgs e)
-        {
-            this.Loading(false);
+        {               
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 PlayerStatus = "Connection established to " + Connection.Server;
             });
+            this.Loading(true, "Loading playlist");
+            Connection.FetchPlaylist(PlaylistFetched);
+        }
+
+
+        // After playlist is fetched
+        // TODO Null check
+        private void PlaylistFetched(object sender, PlaylistEventArgs e)
+        {
+            Loading(false);
         }
 
 

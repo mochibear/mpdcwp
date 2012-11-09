@@ -88,15 +88,19 @@ namespace MPDCWP
 
                 (Application.Current as App).Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
                 (Application.Current as App).Connection.Connect();
-            }            
+            }
         }
 
 
         // If connection is established we can go back to the main page
         private void Connection_CreateConnectionCompleted(object sender, MPDConnectLibrary.CreateConnectionAsyncArgs e)
         {
-            if (NavigationService.CanGoBack)
-                NavigationService.GoBack();
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                if (NavigationService.CanGoBack)
+                    NavigationService.GoBack();
+            });
+
         }
 
 
@@ -130,7 +134,7 @@ namespace MPDCWP
                     if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
                         IsolatedStorageSettings.ApplicationSettings["port"] = value;
                     else
-                        IsolatedStorageSettings.ApplicationSettings.Add("port", value);                    
+                        IsolatedStorageSettings.ApplicationSettings.Add("port", value);
                 }
 
                 if (IsolatedStorageSettings.ApplicationSettings.Contains("username"))

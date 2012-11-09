@@ -41,6 +41,10 @@ namespace MPDConnectLibrary
         private NextEventArgs nextArgs;
 
 
+        // After playlist is fetched
+        private EventHandler<PlaylistEventArgs> PlaylistFetched;
+
+
         // Connection socket
         private Socket connection;
 
@@ -255,13 +259,14 @@ namespace MPDConnectLibrary
             this.SendCommand(command, new string[] { singleAttribute });
         }
 
+        
 
         /// <summary>
         /// Send given command and parameters to the server
         /// </summary>
         /// <param name="command">Command</param>
         /// <param name="attributes">Attributes</param>
-        public void SendCommand(string command, string[] attributes = null)
+        public void SendCommand(string command, string[] attributes = null, EventHandler<SocketAsyncEventArgs> eventCompleted = null)
         {
             if (this.IsConnected)
             {
@@ -278,7 +283,10 @@ namespace MPDConnectLibrary
                 var asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.server, this.port) };
 
                 var buffer = Encoding.UTF8.GetBytes(sb.ToString() + Environment.NewLine);
-                asyncEvent.Completed += asyncEvent_Completed;
+                if (eventCompleted != null)
+                    asyncEvent.Completed += eventCompleted;
+                else
+                    asyncEvent.Completed += asyncEvent_Completed;
                 asyncEvent.SetBuffer(buffer, 0, buffer.Length);
                 connection.SendAsync(asyncEvent);
             }
@@ -297,6 +305,7 @@ namespace MPDConnectLibrary
             if (MessageReceived != null)
             {
                 MessageReceived(this, new AsyncMessageEventArgs(Encoding.UTF8.GetString(e.Buffer, 0, e.BytesTransferred)));
+                MessageReceived = null;
             }
         }
 
@@ -318,6 +327,30 @@ namespace MPDConnectLibrary
         {
             return "pause"; // testidata
         }
-        
+
+
+        /// <summary>
+        /// Fetches the playlist
+        /// </summary>
+        /// <param name="playListFetched">After playlist fetched</param>
+        public void FetchPlaylist(EventHandler<PlaylistEventArgs> playListFetched)
+        {
+            this.PlaylistFetched += playListFetched;
+            this.SendCommand("playlistinfo", null, ParsePlaylist);
+        }
+
+
+        /// <summary>
+        /// To parse playlist from async message
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Args</param>
+        public void ParsePlaylist(object sender, SocketAsyncEventArgs e)
+        {
+            // TODO käy bufferi silmukassa läpi
+            string playListString = Encoding.UTF8.GetString(e.Buffer, 0, e.BytesTransferred);
+            if (PlaylistFetched != null)
+                PlaylistFetched(this, new PlaylistEventArgs(new string[2]));
+        }
     }
 }
