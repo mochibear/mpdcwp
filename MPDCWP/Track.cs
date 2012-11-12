@@ -37,38 +37,33 @@ namespace MPDCWP
     /// </summary>
     public class Track
     {
-        // ID, title, artist and album strings
-        private string id, title, artist, album;
-
-
-        // Track number
-        private int number;
+        /// <summary>
+        /// Track ID in playlist
+        /// </summary>
+        public string ID { get; set; }
 
 
         /// <summary>
-        /// Track ID
+        /// Track length
         /// </summary>
-        public string ID
-        {
-            get { return id; }
-            set { id = value; }
-        }
+        public int Length { get; set; }
+
+        /// <summary>
+        /// Track file name
+        /// </summary>
+        public string File { get; set; }
         
         
         /// <summary>
         /// Track number
         /// </summary>
-        public int Number
-        {
-            get { return number; }
-            set { number = value; }
-        }        
+        public int Number { get; set; }
 
         
         /// <summary>
         /// Track title
         /// </summary>
-        public string Title { get { return title; } set { this.title = value; } }
+        public string Title { get; set; }
 
 
         /// <summary>
@@ -84,20 +79,12 @@ namespace MPDCWP
         /// <summary>
         /// Track artist
         /// </summary>
-        public string Artist
-        {
-            get { return artist; }
-            set { artist = value; }
-        }
+        public string Artist { get; set; }
 
        
         /// <summary>
         /// Track album
         /// </summary>
-        public string Album
-        {
-            get { return album; }
-            set { album = value; }
-        }        
+        public string Album { get; set; }
     }
 }

@@ -48,7 +48,13 @@ namespace MPDConnectLibrary
         /// <summary>
         /// After message is received pass it on
         /// </summary>
-        public EventHandler<ListEventArgs> MessagePass;
+        public EventHandler<MessageArrayEventArgs> MessagePass;
+
+
+        /// <summary>
+        /// After message is received pass it on for test mode
+        /// </summary>
+        public EventHandler<MessageArrayEventArgs> TestMessagesReceived;
 
 
         // Connection socket
@@ -122,7 +128,7 @@ namespace MPDConnectLibrary
         /// <summary>
         /// If message is received from server
         /// </summary>
-        public event EventHandler<AsyncMessageEventArgs> MessageReceived;
+        public event EventHandler<MessageArrayEventArgs> MessageReceived;
 
 
         /// <summary>
@@ -288,12 +294,10 @@ namespace MPDConnectLibrary
             {
                 StringBuilder sb = new StringBuilder(command);
                 if (attributes != null)
-                {
-                    string space = "";
+                {                    
                     foreach (string attr in attributes)
                     {
-                        sb.Append(space + attr);
-                        space = " ";
+                        sb.Append(" " + attr);
                     }
                 }
                 var asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.server, this.port) };
@@ -351,9 +355,18 @@ namespace MPDConnectLibrary
                     lines.Remove(lastLine);
                 }
 
+                MessageArrayEventArgs args = new MessageArrayEventArgs(lines.ToArray());
                 if (MessagePass != null)
                 {
-                    MessagePass(this, new ListEventArgs(lines.ToArray()));                    
+                    MessagePass(this, args);                    
+                }
+                if (MessageReceived != null)
+                {
+                    MessageReceived(this, args); 
+                }
+                if (TestMessagesReceived != null)
+                {
+                    TestMessagesReceived(this, args);
                 }
                 
             }

@@ -11,13 +11,13 @@ using System.Windows.Shapes;
 
 namespace MPDConnectLibrary
 {
-    public class ListEventArgs : EventArgs
+    public class MessageArrayEventArgs : EventArgs
     {
-        public string[] Playlist { get; private set; }
+        public string[] MessageArray { get; private set; }
 
-        public ListEventArgs(string[] playlist)
+        public MessageArrayEventArgs(string[] playlist)
         {
-            this.Playlist = playlist;
+            this.MessageArray = playlist;
         }
     }
 }

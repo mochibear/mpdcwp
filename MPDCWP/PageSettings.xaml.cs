@@ -123,6 +123,11 @@ namespace MPDCWP
                 else
                     IsolatedStorageSettings.ApplicationSettings.Add("autoconnect", checkBoxAutoConnect.IsChecked);
 
+                if (IsolatedStorageSettings.ApplicationSettings.Contains("testmode"))
+                    IsolatedStorageSettings.ApplicationSettings["testmode"] = checkBoxTestMode.IsChecked;
+                else
+                    IsolatedStorageSettings.ApplicationSettings.Add("testmode", checkBoxTestMode.IsChecked);
+
                 if (IsolatedStorageSettings.ApplicationSettings.Contains("server"))
                     IsolatedStorageSettings.ApplicationSettings["server"] = textBoxServer.Text;
                 else
@@ -229,6 +234,20 @@ namespace MPDCWP
 
         // Password text changed
         private void textBoxPassword_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!loaded)
+                return;
+            this.valuesChanged = true;
+        }
+
+        private void checkBoxTestMode_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!loaded)
+                return;
+            this.valuesChanged = true;
+        }
+
+        private void checkBoxTestMode_Unchecked(object sender, RoutedEventArgs e)
         {
             if (!loaded)
                 return;

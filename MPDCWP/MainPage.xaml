@@ -92,7 +92,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
             <!-- Soittolista -->
             <controls:PivotItem x:Name="pivotItemPlaylist" Header="playlist" Margin="12,28,12,0">
                 <Grid>
-                    <ListBox HorizontalAlignment="Left" Name="listBoxPlaylist" VerticalAlignment="Top" Height="536" Width="457" SelectionChanged="listBoxBrowse_SelectionChanged" />
+                    <ListBox HorizontalAlignment="Left" Name="listBoxPlaylist" VerticalAlignment="Top" Height="536" Width="457" SelectionChanged="listBoxPlaylist_SelectionChanged" />
                     <!-- Collection Blendiä varten-->
                     <Path Data="M349,226" Fill="#FFF4F4F5" HorizontalAlignment="Right" Height="0" Margin="0,226,107,0" Stretch="Fill" Stroke="Black" UseLayoutRounding="False" VerticalAlignment="Top" Width="0"/>
                 </Grid>
@@ -115,7 +115,13 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
                 	<TextBox x:Name="textBoxSearch" Margin="8,8,8,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="75" />
                 	<ListBox Margin="8,83,8,8" ItemTemplate="{StaticResource ItemTemplate}" ItemsSource="{Binding Collection}" Name="listBoxSearch" /> <!-- Collection Blendiä varten-->
                 </Grid>
-            </controls:PivotItem>            
+            </controls:PivotItem>
+            <!-- Test Mode -->
+            <controls:PivotItem x:Name="controlTestMode" Header="test">
+                <Grid> 
+                    <ListBox Height="545" HorizontalAlignment="Left" Name="listBoxTestOutput" VerticalAlignment="Top" Width="457" />
+                </Grid>                    
+            </controls:PivotItem>
         </controls:Pivot>
     </Grid>
 

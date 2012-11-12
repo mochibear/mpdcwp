@@ -20,7 +20,7 @@
  *
  * 
  * TODO Status/State mukaan, onko soitto päällä vai ei
- * 
+ * TODO Hae soitettavan kappaleen indeksi
  */
 using System;
 using System.Collections.Generic;
@@ -47,8 +47,8 @@ namespace MPDCWP
     /// </summary>
     public partial class MainPage : PhoneApplicationPage
     {
-        // Page loaded, something is being loaded
-        private bool loaded, loading;
+        // Page loaded, something is being loaded, Is test mode enabled
+        private bool loaded, loading, testmode;
 
 
         // Index of current track in playlist
@@ -125,13 +125,25 @@ namespace MPDCWP
         // Load settings
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("testmode"))
+                this.testmode = (bool)IsolatedStorageSettings.ApplicationSettings["testmode"];
+            if (testmode)
+            {
+                if (Connection.TestMessagesReceived == null)
+                    Connection.TestMessagesReceived += TestMessagesReceived;
+                controlTestMode.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                Connection.TestMessagesReceived = null;
+                controlTestMode.Visibility = System.Windows.Visibility.Collapsed;
+            }
+
             if (loaded)
                 return;
             //this.AddDemoData();
             listBoxBrowse.ItemsSource = Artists;
             listBoxSearch.ItemsSource = Artists;
-            imageDownloader1.ImagePageUrl = imageSourceUrl + "anathema+weather+systems";
-
             // TODO TryGetValue
 
             if (IsolatedStorageSettings.ApplicationSettings.Contains("username"))
@@ -142,6 +154,8 @@ namespace MPDCWP
                 this.Connection.Server = (string)IsolatedStorageSettings.ApplicationSettings["server"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
                 this.Connection.Port = (int)IsolatedStorageSettings.ApplicationSettings["port"];
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("testmode"))
+                this.testmode = (bool)IsolatedStorageSettings.ApplicationSettings["testmode"];
             this.Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
             this.Connection.CreateConnectionFailed += Connection_CreateConnectionFailed;
 
@@ -156,6 +170,16 @@ namespace MPDCWP
                 this.Connection.Connect();
             }
             this.loaded = true;
+        }
+
+        // TODO Jotta ei ladata joka kerta kuvaa, mutta huomataan, jos albumi vaihtuu
+        private void LoadCurrentImage()
+        {
+            if (Playlist.Count > 0)
+            {
+                Track track = Playlist[currentTrack % Playlist.Count];
+                imageDownloader1.ImagePageUrl = imageSourceUrl + track.Artist.ToLower().Replace(" ", "+") + "+" + track.Album.ToLower().Replace(" ", "+");
+            }
         }
 
 
@@ -188,6 +212,7 @@ namespace MPDCWP
                 PlayerStatus = "Connection established to " + Connection.Server;
             });
             this.Loading(true, "Loading playlist");
+            Deployment.Current.Dispatcher.BeginInvoke(() => { Playlist.Clear(); });            
             GetPlaylist();
         }
 
@@ -201,52 +226,52 @@ namespace MPDCWP
         // After playlist is fetched
         // TODO Entä jos on tyhjä? Tällöin palautetaan pelkkä OK. Mutta jos palautetaankin jonkun muun komenonn tulokset välissä.
         // TODO Null check
-        private void PlaylistFetched(object sender, ListEventArgs e)
+        private void PlaylistFetched(object sender, MessageArrayEventArgs e)
         {
+            List<Track> tracks = ParseTracks(e.MessageArray);
             Deployment.Current.Dispatcher.BeginInvoke(() =>
-           {
-               Playlist.Clear();
-
-               if (e.Playlist != null)
+           {               
+               foreach (Track track in tracks)
                {
-                   Track newtrack = null;
-                   foreach (string item in e.Playlist)
-                   {
-                       if (item.Contains("file:"))
-                       {
-                           if (newtrack != null)
-                               Playlist.Add(newtrack);
-                           newtrack = new Track();
-                       }
-                       else if (item.Contains("Artist:"))
-                           newtrack.Artist = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
-                       else if (item.Contains("Title:"))
-                           newtrack.Title = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
-                       else if (item.Contains("Album:"))
-                           newtrack.Album = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
-                   }
+                   Playlist.Add(track);
                }
-               // TODO Tarkista, miksi ei lista päivity, vaikka on observable collection, jotta nullauksen voi ottaa pois
-               listBoxPlaylist.ItemsSource = null;
-               listBoxPlaylist.ItemsSource = Playlist;
-           });
-            Connection.MessagePass -= PlaylistFetched;
-            Loading(false);
+           });            
+            
         }
 
 
-        // Add demo data
-        private void AddDemoData()
+        // TODO Voisi miettiä viitteillä toteuttamista myös
+        private List<Track> ParseTracks(string[] strings)
         {
-            string[] names = new string[] { "Anathema", "Eva & Manu", "In flames", "Opeth", "Pain", "Porcupine Tree", "Storm Corrosion", "Soilwork" };
-            foreach (string name in names)
+            if (strings != null)
             {
-                Artist artist = new Artist();
-                artist.Name = name;
-                artist.Albums.Add(new Album() { Title = "Albumi 1", Tracks = new List<Track> { new Track() { Number = 1, Title = "Kappale 1", Album = "Albumi 1", Artist = artist.Name }, new Track() { Number = 2, Title = "Kappale 2", Album = "Albumi 1", Artist = artist.Name } } });
-                artist.Albums.Add(new Album() { Title = "Albumi 2", Tracks = new List<Track> { new Track() { Number = 1, Title = "Kappale 1", Album = "Albumi 2", Artist = artist.Name }, new Track() { Number = 2, Title = "Kappale 2", Album = "Albumi 2", Artist = artist.Name } } });
-                Artists.Add(artist);
+                List<Track> tracks = new List<Track>();
+                Track newtrack = new Track();
+                foreach (string item in strings)
+                {
+                    if (item.StartsWith("file:"))
+                        newtrack.File = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                    else if (item.StartsWith("Artist:"))
+                        newtrack.Artist = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                    else if (item.StartsWith("Title:"))
+                        newtrack.Title = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                    else if (item.StartsWith("Album:"))
+                        newtrack.Album = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                    else if (item.StartsWith("Id:"))
+                    {
+                        newtrack.ID = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                        tracks.Add(newtrack);
+                        newtrack = new Track();
+                    }
+                    else if (item.Equals("OK"))
+                    {
+                        Connection.MessagePass -= PlaylistFetched;
+                        Loading(false);
+                    }
+                }
+                return tracks;
             }
+            return null;
         }
 
 
@@ -390,6 +415,8 @@ namespace MPDCWP
                 else
                     Connection.SendCommand(MPDClient.PLAY);
                 PlayerStatus = "Playing";
+                // TODO Tarkistus, vaihtuuko albumi
+                LoadCurrentImage();
             }
         }
 
@@ -443,7 +470,37 @@ namespace MPDCWP
 
         private void appbar_buttonRefreshPlaylist_Click(object sender, EventArgs e)
         {
+            Loading(true, "Loading playlist...");
             GetPlaylist();
+        }
+
+        private void listBoxPlaylist_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (listBoxPlaylist.SelectedIndex == -1)
+                return;
+            Track track = (Track) listBoxPlaylist.SelectedItem;
+            if (track == null)
+                return;
+            currentTrack = listBoxPlaylist.SelectedIndex;
+            Connection.SendCommand("playid", track.ID);
+        }
+
+        private void TestMessagesReceived(object sender, MessageArrayEventArgs e)
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                if (listBoxTestOutput.Items.Count > 500)
+                {
+                    for (int i = 0; i < 100; i++)
+                    {
+                        listBoxTestOutput.Items.RemoveAt(0);
+                    }
+                }
+                foreach (string item in e.MessageArray)
+                {
+                    listBoxTestOutput.Items.Add(item);
+                }
+            });
         }
     }
 }
