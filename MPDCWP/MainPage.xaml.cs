@@ -48,10 +48,20 @@ namespace MPDCWP
     public partial class MainPage : PhoneApplicationPage
     {
         // Page loaded, something is being loaded, Is test mode enabled
-        private bool loaded, loading, testmode, artistsDivided;
+        private bool loaded, loading, testmode;
+
+        
+        // Temporary list for downloading playlist lines
+        private List<string> playlistLines = new List<string>();
 
 
+        // Temporary list for downloading all tracks
+        private List<string> lines = new List<string>();
+
+
+        // Get all tracks event handler
         private EventHandler getAllTracksEvent;
+        
 
         // Index of current track in playlist
         private int currentTrack;
@@ -185,7 +195,9 @@ namespace MPDCWP
             this.loaded = true;
         }
 
+
         // TODO Jotta ei ladata joka kerta kuvaa, mutta huomataan, jos albumi vaihtuu
+        // Load current album image
         private void LoadCurrentImage()
         {
             if (Playlist.Count > 0)
@@ -231,22 +243,24 @@ namespace MPDCWP
         }
 
 
+        // Get all tracks handler
         private void MainPage_GetAllTracks(object sender, EventArgs e)
         {
             this.GetAllTracks();
         }
 
+
+        // Get all tracks
         private void GetAllTracks()
         {
-            artistsDivided = false;
             Loading(true, "Downloading database...");
             lines.Clear();
             Connection.MessagePass += AllTracksFetched;
             Connection.SendCommand("listallinfo");
         }
 
-        private List<string> lines = new List<string>();
-
+        
+        // When all tracks is fetched
         private void AllTracksFetched(object sender, MessageArrayEventArgs e)
         {
             lines.AddRange(e.MessageArray);
@@ -266,14 +280,14 @@ namespace MPDCWP
                 {
                     listBoxSearch.ItemsSource = null;
                     listBoxSearch.ItemsSource = AllTracks;
-                    //DivideTracks();
+                    DivideTracks();
                 });
             }
         }
 
 
         // TODO Voisi miettiä viitteillä toteuttamista myös
-        // TODO directory: -> album
+        // TODO directory: -> artist/album tällöin voi lisätä myös koko kansiollisen samalla add-käskyllä
         private List<Track> ParseAllTracks(List<string> strings)
         {
             if (strings != null)
@@ -313,6 +327,9 @@ namespace MPDCWP
             return null;
         }
 
+
+        // Divide tracks into albums and artists
+        // TODO muuta parsintakohtaan
         private void DivideTracks()
         {
             Artists.Clear();
@@ -357,6 +374,7 @@ namespace MPDCWP
         }
 
 
+        // Possible sort method for all tracks
         private void SortTracks()
         {
             // Sort
@@ -371,8 +389,7 @@ namespace MPDCWP
             playlistLines.Clear();
             Connection.SendCommand("playlistinfo");
         }
-
-        private List<string> playlistLines = new List<string>();
+                
 
         // After playlist is fetched
         // TODO Entä jos on tyhjä? Tällöin palautetaan pelkkä OK. Mutta jos palautetaankin jonkun muun komenonn tulokset välissä.
@@ -381,10 +398,11 @@ namespace MPDCWP
         {
             playlistLines.AddRange(e.MessageArray);
             if (e.MessageArray.Contains("OK"))
-            {
+            {                
                 List<Track> tracks = ParseTracks(e.MessageArray);
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
+                    Playlist.Clear();
                     foreach (Track track in tracks)
                     {
                         Playlist.Add(track);
@@ -399,6 +417,7 @@ namespace MPDCWP
 
 
         // TODO Voisi miettiä viitteillä toteuttamista myös
+        // Parse tracks from string array
         private List<Track> ParseTracks(string[] strings)
         {
             if (strings != null)
@@ -618,16 +637,21 @@ namespace MPDCWP
         // If page is changed, check if it is playlist and if it is, fetch playlist
         private void mainControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (mainControl.SelectedItem == pivotItemBrowse && !artistsDivided)
-                DivideTracks();
+            //if (mainControl.SelectedItem == pivotItemBrowse && !artistsDivided)
+            //    DivideTracks();
         }
 
+
+        // Refresh playlist
         private void appbar_buttonRefreshPlaylist_Click(object sender, EventArgs e)
         {
             Loading(true, "Loading playlist...");
             GetPlaylist();
         }
 
+
+        // Selection changed in playlist
+        // Play selected song
         private void listBoxPlaylist_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (listBoxPlaylist.SelectedIndex == -1)
@@ -639,6 +663,8 @@ namespace MPDCWP
             Connection.SendCommand("playid", track.ID);
         }
 
+
+        // Test messages received
         private void TestMessagesReceived(object sender, MessageArrayEventArgs e)
         {
             Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -657,10 +683,38 @@ namespace MPDCWP
             });
         }
 
+
+        // Download database
         private void appbar_buttonUpdateDatabase_Click(object sender, EventArgs e)
         {
             AllTracks.Clear();
             GetAllTracks();
+        }
+
+
+        // Context menu, clear playlist
+        private void ContextMenuItem_ClickClearPlaylist(object sender, RoutedEventArgs e)
+        {
+            Connection.SendCommand("clear");
+            Playlist.Clear();
+        }
+
+
+        // Conext menu, remove object
+        private void ContextMenuItem_ClickRemove(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = sender as MenuItem;
+            if (menuItem == null)
+                return;
+            FrameworkElement fe = VisualTreeHelper.GetParent(menuItem) as FrameworkElement;
+            if (fe == null)
+                return;
+            if (fe.DataContext is Track)
+            {
+                Connection.SendCommand("delete", (fe.DataContext as Track).ID);
+                // TODO Nyt poistaa ensimmäisen olion, joka vastaa tätä. Voisi poistaa juuri sen oikean, jos esim. on useampia esiintymiä.
+                Playlist.Remove((fe.DataContext as Track));
+            }
         }
     }
 }

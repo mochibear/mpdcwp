@@ -54,7 +54,12 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
 			</StackPanel>
 		</DataTemplate>
 		<DataTemplate x:Key="TracksItemTemplate">
-			<StackPanel Orientation="Horizontal">
+            <toolkit:ContextMenuService.ContextMenu>
+                <toolkit:ContextMenu>
+                    <toolkit:MenuItem Header="Add to playlist" Click="ContextMenuItem_Click"/>
+                </toolkit:ContextMenu>
+            </toolkit:ContextMenuService.ContextMenu>
+            <StackPanel Orientation="Horizontal">
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="{Binding Number}" VerticalAlignment="Bottom"  FontSize="30" x:Name="textBlockTrackNumber" Visibility="{Binding Path=Number, Converter={StaticResource  NumberToVisibilityConverter}}" />
                     <TextBlock Text=". " VerticalAlignment="Bottom" FontSize="30" Visibility="{Binding ElementName=textBlockTrackNumber, Path=Visibility}" />

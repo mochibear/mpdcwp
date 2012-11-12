@@ -54,7 +54,18 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
                 </toolkit:ContextMenuService.ContextMenu>
         		<TextBlock Text="{Binding Name}" FontSize="30" x:Name="textBlockArtistName" />        		
         	</StackPanel>
-        </DataTemplate>        
+        </DataTemplate>
+        <DataTemplate x:Key="PlaylistItemTemplate">
+            <StackPanel>
+                <toolkit:ContextMenuService.ContextMenu>
+                    <toolkit:ContextMenu>
+                        <toolkit:MenuItem Header="Remove from playlist" Click="ContextMenuItem_ClickRemove"/>
+                        <toolkit:MenuItem Header="Clear playlist" Click="ContextMenuItem_ClickClearPlaylist"/>
+                    </toolkit:ContextMenu>
+                </toolkit:ContextMenuService.ContextMenu>
+                <TextBlock Text="{Binding Title}" FontSize="20" x:Name="textBlockTrackTitle" />
+            </StackPanel>
+        </DataTemplate>
     </phone:PhoneApplicationPage.Resources>
     
     
@@ -92,7 +103,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
             <!-- Soittolista -->
             <controls:PivotItem x:Name="pivotItemPlaylist" Header="playlist" Margin="12,28,12,0">
                 <Grid>
-                    <ListBox HorizontalAlignment="Left" Name="listBoxPlaylist" VerticalAlignment="Top" Height="536" Width="457" SelectionChanged="listBoxPlaylist_SelectionChanged" />
+                    <ListBox HorizontalAlignment="Left" Name="listBoxPlaylist" VerticalAlignment="Top" Height="536" Width="457" SelectionChanged="listBoxPlaylist_SelectionChanged" ItemTemplate="{StaticResource PlaylistItemTemplate}" />
                     <!-- Collection Blendiä varten-->
                     <Path Data="M349,226" Fill="#FFF4F4F5" HorizontalAlignment="Right" Height="0" Margin="0,226,107,0" Stretch="Fill" Stroke="Black" UseLayoutRounding="False" VerticalAlignment="Top" Width="0"/>
                 </Grid>

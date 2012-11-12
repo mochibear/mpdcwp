@@ -74,16 +74,19 @@ namespace MPDCWP
         }
 
 
-
+        // All tracks in database
         private List<Track> allTracks = new List<Track>();
 
+
+        /// <summary>
+        /// All tracks in database
+        /// </summary>
         public List<Track> AllTracks
         {
             get { return allTracks; }
             set { allTracks = value; }
         }
         
-
         
         /// <summary>
         /// Selected artist

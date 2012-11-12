@@ -240,6 +240,8 @@ namespace MPDCWP
             this.valuesChanged = true;
         }
 
+
+        // Checkbox for test mode checked
         private void checkBoxTestMode_Checked(object sender, RoutedEventArgs e)
         {
             if (!loaded)
@@ -247,6 +249,8 @@ namespace MPDCWP
             this.valuesChanged = true;
         }
 
+
+        // Checkbox for test mode unchecked
         private void checkBoxTestMode_Unchecked(object sender, RoutedEventArgs e)
         {
             if (!loaded)

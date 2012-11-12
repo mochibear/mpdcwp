@@ -41,8 +41,17 @@ namespace MPDConnectLibrary
         // Buffer size
         private const int bufferSize = 2048;
 
+
         // Next task args (command)
         private NextEventArgs nextArgs;
+
+
+        // Trailing message for messages listener
+        private string trailingMessage;
+
+
+        // Connection socket
+        private Socket connection;
 
 
         /// <summary>
@@ -55,27 +64,7 @@ namespace MPDConnectLibrary
         /// After message is received pass it on for test mode
         /// </summary>
         public EventHandler<MessageArrayEventArgs> TestMessagesReceived;
-
-
-        // Connection socket
-        private Socket connection;
-
-
-        // Server address
-        private string server;
-
-
-        // Server port
-        private int port;
-
-
-        // Server username
-        private string username;
-
-
-        // Server password
-        private string password;
-
+        
 
         /// <summary>
         /// Next command
@@ -134,11 +123,7 @@ namespace MPDConnectLibrary
         /// <summary>
         /// Next task args
         /// </summary>        
-        public NextEventArgs NextArgs
-        {
-            get { return nextArgs; }
-            set { nextArgs = value; }
-        }
+        public NextEventArgs NextArgs { get; set; }
 
 
         /// <summary>
@@ -156,41 +141,25 @@ namespace MPDConnectLibrary
         /// <summary>
         /// Server address
         /// </summary>
-        public string Server
-        {
-            get { return server; }
-            set { server = value; }
-        }
+        public string Server { get; set; }
 
 
         /// <summary>
         /// Server port
         /// </summary>
-        public int Port
-        {
-            get { return port; }
-            set { port = value; }
-        }
+        public int Port { get; set; }
 
 
         /// <summary>
         /// Server username
         /// </summary>
-        public string Username
-        {
-            get { return username; }
-            set { username = value; }
-        }
+        public string Username { get; set; }
 
 
         /// <summary>
         /// Server password
         /// </summary>
-        public string Password
-        {
-            get { return password; }
-            set { password = value; }
-        }
+        public string Password { get; set; }
 
 
         /// <summary>
@@ -207,7 +176,7 @@ namespace MPDConnectLibrary
         /// </summary>
         public void Connect()
         {
-            this.Connect(this.server, this.port);
+            this.Connect(this.Server, this.Port);
         }
 
 
@@ -273,6 +242,9 @@ namespace MPDConnectLibrary
         }
 
 
+        /// <summary>
+        /// Start receiving messages
+        /// </summary>
         public void StartReceivingMessages()
         {
             SocketAsyncEventArgs responseListener = new SocketAsyncEventArgs();
@@ -300,7 +272,7 @@ namespace MPDConnectLibrary
                         sb.Append(" " + attr);
                     }
                 }
-                var asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.server, this.port) };
+                var asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.Server, this.Port) };
 
                 var buffer = Encoding.UTF8.GetBytes(sb.ToString() + Environment.NewLine);
                 
@@ -323,9 +295,8 @@ namespace MPDConnectLibrary
 
         }
 
-
-
-        private string trailingMessage;
+        
+        // When message received from server
         private void OnMessageReceivedFromServer(object sender, SocketAsyncEventArgs e)
         {           
             string message = Encoding.UTF8.GetString(e.Buffer, 0, e.BytesTransferred);

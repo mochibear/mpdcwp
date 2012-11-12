@@ -162,14 +162,14 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="28" />
-                <RowDefinition Height="82" />
+                <RowDefinition Height="80" />
                 <RowDefinition Height="28" />
-                <RowDefinition Height="82" />
+                <RowDefinition Height="80" />
                 <RowDefinition Height="28" />
-                <RowDefinition Height="82" />
-                <RowDefinition Height="70" />
-                <RowDefinition Height="70" />
-                <RowDefinition Height="70"/>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="65" />
+                <RowDefinition Height="65" />
+                <RowDefinition Height="65"/>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Name="textBlockServer" Text="Server" Grid.Row="0" Grid.Column="0" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="55" />
