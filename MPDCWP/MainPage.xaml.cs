@@ -48,8 +48,10 @@ namespace MPDCWP
     public partial class MainPage : PhoneApplicationPage
     {
         // Page loaded, something is being loaded, Is test mode enabled
-        private bool loaded, loading, testmode;
+        private bool loaded, loading, testmode, artistsDivided;
 
+
+        private EventHandler getAllTracksEvent;
 
         // Index of current track in playlist
         private int currentTrack;
@@ -66,6 +68,16 @@ namespace MPDCWP
         {
             get { return (Application.Current as App).Connection; }
             set { (Application.Current as App).Connection = value; }
+        }
+
+
+        /// <summary>
+        /// All tracks from database
+        /// </summary>
+        public List<Track> AllTracks
+        {
+            get { return (Application.Current as App).AllTracks; }
+            set { (Application.Current as App).AllTracks = value; }
         }
 
 
@@ -129,13 +141,14 @@ namespace MPDCWP
                 this.testmode = (bool)IsolatedStorageSettings.ApplicationSettings["testmode"];
             if (testmode)
             {
-                if (Connection.TestMessagesReceived == null)
+                if (Connection != null && Connection.TestMessagesReceived == null)
                     Connection.TestMessagesReceived += TestMessagesReceived;
                 controlTestMode.Visibility = System.Windows.Visibility.Visible;
             }
             else
             {
-                Connection.TestMessagesReceived = null;
+                if (Connection != null)
+                    Connection.TestMessagesReceived = null;
                 controlTestMode.Visibility = System.Windows.Visibility.Collapsed;
             }
 
@@ -212,31 +225,176 @@ namespace MPDCWP
                 PlayerStatus = "Connection established to " + Connection.Server;
             });
             this.Loading(true, "Loading playlist");
-            Deployment.Current.Dispatcher.BeginInvoke(() => { Playlist.Clear(); });            
+            Deployment.Current.Dispatcher.BeginInvoke(() => { Playlist.Clear(); });
+            getAllTracksEvent += MainPage_GetAllTracks;
             GetPlaylist();
         }
 
 
+        private void MainPage_GetAllTracks(object sender, EventArgs e)
+        {
+            this.GetAllTracks();
+        }
+
+        private void GetAllTracks()
+        {
+            artistsDivided = false;
+            Loading(true, "Downloading database...");
+            lines.Clear();
+            Connection.MessagePass += AllTracksFetched;
+            Connection.SendCommand("listallinfo");
+        }
+
+        private List<string> lines = new List<string>();
+
+        private void AllTracksFetched(object sender, MessageArrayEventArgs e)
+        {
+            lines.AddRange(e.MessageArray);
+            if (e.MessageArray.Contains("OK"))
+            {
+                List<Track> tracks = ParseAllTracks(lines);
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    foreach (Track track in tracks)
+                    {
+                        AllTracks.Add(track);
+                    }
+                });
+                Connection.MessagePass -= AllTracksFetched;
+                Loading(false);
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    listBoxSearch.ItemsSource = null;
+                    listBoxSearch.ItemsSource = AllTracks;
+                    //DivideTracks();
+                });
+            }
+        }
+
+
+        // TODO Voisi miettiä viitteillä toteuttamista myös
+        // TODO directory: -> album
+        private List<Track> ParseAllTracks(List<string> strings)
+        {
+            if (strings != null)
+            {
+                List<Track> tracks = new List<Track>();
+                Track newtrack = null;
+                foreach (string item in strings)
+                {
+                    if (item.StartsWith("directory:"))
+                        continue;
+                    if (item.StartsWith("file:"))
+                    {
+                        if (newtrack != null)
+                            tracks.Add(newtrack);
+                        newtrack = new Track();
+                        newtrack.File = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                    }
+                    else if (item.StartsWith("Artist:"))
+                        newtrack.Artist = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                    else if (item.StartsWith("Title:"))
+                        newtrack.Title = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                    else if (item.StartsWith("Album:"))
+                        newtrack.Album = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                    else if (item.StartsWith("Track:"))
+                    {
+                        int number = 0;
+                        Int32.TryParse(item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1)), out number);
+                        newtrack.Number = number;
+                    }
+                    else if (item.StartsWith("Genre:"))
+                    {
+
+                    }
+                }
+                return tracks;
+            }
+            return null;
+        }
+
+        private void DivideTracks()
+        {
+            Artists.Clear();
+            foreach (Track track in AllTracks)
+            {
+                bool artistFound = false;
+                foreach (Artist artist in Artists)
+                {
+                    if (artist.Name.Equals(track.Artist))
+                    {
+                        bool albumFound = false;
+                        foreach (Album album in artist.Albums)
+                        {
+                            if (album.Title.Equals(track.Album))
+                            {
+                                album.Tracks.Add(track);
+                                albumFound = true;
+                                break;
+                            }
+                            if (!albumFound)
+                            {
+                                Album newalbum = new Album() { Title = track.Album };
+                                newalbum.Tracks.Add(track);
+                                artist.Albums.Add(newalbum);
+                            }
+                        }
+                        artistFound = true;
+                        break;
+                    }
+                }
+                if (!artistFound)
+                {
+                    Artist artist = new Artist() { Name = track.Artist };
+                    Artists.Add(artist);
+                    Album album = new Album() { Title = track.Album };
+                    artist.Albums.Add(album);
+                    album.Tracks.Add(track);
+                }
+            }
+            listBoxBrowse.ItemsSource = null;
+            listBoxBrowse.ItemsSource = Artists;
+        }
+
+
+        private void SortTracks()
+        {
+            // Sort
+        }
+
+        /// <summary>
+        /// Get playlist
+        /// </summary>
         private void GetPlaylist()
         {
             Connection.MessagePass += PlaylistFetched;
+            playlistLines.Clear();
             Connection.SendCommand("playlistinfo");
         }
+
+        private List<string> playlistLines = new List<string>();
 
         // After playlist is fetched
         // TODO Entä jos on tyhjä? Tällöin palautetaan pelkkä OK. Mutta jos palautetaankin jonkun muun komenonn tulokset välissä.
         // TODO Null check
         private void PlaylistFetched(object sender, MessageArrayEventArgs e)
         {
-            List<Track> tracks = ParseTracks(e.MessageArray);
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
-           {               
-               foreach (Track track in tracks)
-               {
-                   Playlist.Add(track);
-               }
-           });            
-            
+            playlistLines.AddRange(e.MessageArray);
+            if (e.MessageArray.Contains("OK"))
+            {
+                List<Track> tracks = ParseTracks(e.MessageArray);
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    foreach (Track track in tracks)
+                    {
+                        Playlist.Add(track);
+                    }
+                });
+                Connection.MessagePass -= PlaylistFetched;
+                Loading(false);
+                if (getAllTracksEvent != null)
+                    getAllTracksEvent(this, new EventArgs());
+            }
         }
 
 
@@ -262,11 +420,6 @@ namespace MPDCWP
                         newtrack.ID = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
                         tracks.Add(newtrack);
                         newtrack = new Track();
-                    }
-                    else if (item.Equals("OK"))
-                    {
-                        Connection.MessagePass -= PlaylistFetched;
-                        Loading(false);
                     }
                 }
                 return tracks;
@@ -465,7 +618,8 @@ namespace MPDCWP
         // If page is changed, check if it is playlist and if it is, fetch playlist
         private void mainControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            if (mainControl.SelectedItem == pivotItemBrowse && !artistsDivided)
+                DivideTracks();
         }
 
         private void appbar_buttonRefreshPlaylist_Click(object sender, EventArgs e)
@@ -478,7 +632,7 @@ namespace MPDCWP
         {
             if (listBoxPlaylist.SelectedIndex == -1)
                 return;
-            Track track = (Track) listBoxPlaylist.SelectedItem;
+            Track track = (Track)listBoxPlaylist.SelectedItem;
             if (track == null)
                 return;
             currentTrack = listBoxPlaylist.SelectedIndex;
@@ -501,6 +655,12 @@ namespace MPDCWP
                     listBoxTestOutput.Items.Add(item);
                 }
             });
+        }
+
+        private void appbar_buttonUpdateDatabase_Click(object sender, EventArgs e)
+        {
+            AllTracks.Clear();
+            GetAllTracks();
         }
     }
 }

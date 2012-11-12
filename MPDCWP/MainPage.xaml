@@ -131,7 +131,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
             <shell:ApplicationBarIconButton x:Name="appbar_buttonRefreshPlaylist" IconUri="/Images/appbar.sync.rest.png" Text="Refresh playlist" Click="appbar_buttonRefreshPlaylist_Click" />
             <shell:ApplicationBarIconButton x:Name="appbar_buttonSettings" IconUri="/Images/appbar.feature.settings.rest.png" Text="Info" Click="appbar_buttonSettings_Click" />
             <shell:ApplicationBarIconButton x:Name="appbar_buttonInfo" IconUri="/Images/appbar.questionmark.rest.png" Text="Settings" Click="appbar_buttonInfo_Click" />
-            
+            <shell:ApplicationBarIconButton x:Name="appbar_buttonUpdateDatabase" IconUri="/Images/appbar.sync.rest.png" Text="Update database" Click="appbar_buttonUpdateDatabase_Click" />
             
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>

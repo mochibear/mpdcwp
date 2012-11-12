@@ -103,6 +103,7 @@ namespace MPDCWP
             if (fe.DataContext is Track)
             {
                 (Application.Current as App).Playlist.Add((Track)fe.DataContext);
+                (Application.Current as App).Connection.SendCommand("add", ((Track)fe.DataContext).File);
             }
             else if (fe.DataContext is Album)
             {

@@ -28,6 +28,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:local="clr-namespace:MPDCWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
@@ -38,6 +39,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
     SupportedOrientations="Portrait"  Orientation="Portrait"
     shell:SystemTray.IsVisible="True">
 	<phone:PhoneApplicationPage.Resources>
+        <local:VisibilityConverter x:Key="NumberToVisibilityConverter" />
 		<DataTemplate x:Key="AlbumsItemTemplate">
 			<StackPanel Orientation="Horizontal">
                 <toolkit:ContextMenuService.ContextMenu>
@@ -53,15 +55,10 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
 		</DataTemplate>
 		<DataTemplate x:Key="TracksItemTemplate">
 			<StackPanel Orientation="Horizontal">
-				<Button BorderBrush="{x:Null}" Width="70" Height="70">
-                    <Button.Background>
-                        <ImageBrush ImageSource="/MPDCWP;component/Images/appbar.add.rest.png" />
-                    </Button.Background>
-                </Button>
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-				<TextBlock Text="{Binding Number}" VerticalAlignment="Bottom"  FontSize="30" x:Name="textBlockTrackNumber" />
-				<TextBlock Text=". " VerticalAlignment="Bottom" FontSize="30" />	
-				<TextBlock Text="{Binding Title}"  FontSize="30" VerticalAlignment="Bottom" x:Name="textBlockTrackTitle" />					
+                    <TextBlock Text="{Binding Number}" VerticalAlignment="Bottom"  FontSize="30" x:Name="textBlockTrackNumber" Visibility="{Binding Path=Number, Converter={StaticResource  NumberToVisibilityConverter}}" />
+                    <TextBlock Text=". " VerticalAlignment="Bottom" FontSize="30" Visibility="{Binding ElementName=textBlockTrackNumber, Path=Visibility}" />
+				<TextBlock Text="{Binding Title}"  FontSize="30" VerticalAlignment="Bottom" x:Name="textBlockTrackTitle"  />					
 				</StackPanel>
 			</StackPanel>
 		</DataTemplate>

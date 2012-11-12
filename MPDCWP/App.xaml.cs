@@ -73,6 +73,17 @@ namespace MPDCWP
             set { connection = value; }
         }
 
+
+
+        private List<Track> allTracks = new List<Track>();
+
+        public List<Track> AllTracks
+        {
+            get { return allTracks; }
+            set { allTracks = value; }
+        }
+        
+
         
         /// <summary>
         /// Selected artist
