@@ -83,7 +83,7 @@ namespace MPDCWP
                     (Application.Current as App).Connection.Server = textBoxServer.Text;
                     int value;
                     if (Int32.TryParse(textBoxPort.Text, out value))
-                        (Application.Current as App).Connection.Port = value;
+                        (Application.Current as App).Connection.Port = value;                    
                 }
 
                 (Application.Current as App).Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
@@ -151,6 +151,7 @@ namespace MPDCWP
                 }
                 else if ((bool)checkBoxSavePassword.IsChecked)
                     IsolatedStorageSettings.ApplicationSettings.Add("password", textBoxPort.Text);
+                IsolatedStorageSettings.ApplicationSettings.Save();
             }
             base.OnNavigatingFrom(e);
         }

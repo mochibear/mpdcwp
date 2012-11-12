@@ -51,6 +51,10 @@ namespace MPDCWP
         private bool loaded, loading;
 
 
+        // Index of current track in playlist
+        private int currentTrack;
+
+
         // Progressbar
         private ProgressIndicator progressIndicator;
 
@@ -140,9 +144,12 @@ namespace MPDCWP
                 this.Connection.Port = (int)IsolatedStorageSettings.ApplicationSettings["port"];
             this.Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
             this.Connection.CreateConnectionFailed += Connection_CreateConnectionFailed;
-            // TODO Pitää tarkistaa, jotta jos tullaan pagesettingsistä, ei varmaan halutakaan yhdistää. Ehkä kysymys?
+
             if (!Connection.IsConnected && (!IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect") || !(bool)IsolatedStorageSettings.ApplicationSettings["autoconnect"]))
-                NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
+            {
+                if (MessageBox.Show("Not connected to server. Connect now?", "Connection", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                    NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
+            }
             else
             {
                 this.Loading(true, "Connecting to server...");
@@ -175,20 +182,55 @@ namespace MPDCWP
 
         // If connection is success
         private void Connection_CreateConnectionCompleted(object sender, CreateConnectionAsyncArgs e)
-        {               
+        {
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 PlayerStatus = "Connection established to " + Connection.Server;
             });
             this.Loading(true, "Loading playlist");
-            Connection.FetchPlaylist(PlaylistFetched);
+            GetPlaylist();
         }
 
 
-        // After playlist is fetched
-        // TODO Null check
-        private void PlaylistFetched(object sender, PlaylistEventArgs e)
+        private void GetPlaylist()
         {
+            Connection.MessagePass += PlaylistFetched;
+            Connection.SendCommand("playlistinfo");
+        }
+
+        // After playlist is fetched
+        // TODO Entä jos on tyhjä? Tällöin palautetaan pelkkä OK. Mutta jos palautetaankin jonkun muun komenonn tulokset välissä.
+        // TODO Null check
+        private void PlaylistFetched(object sender, ListEventArgs e)
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+           {
+               Playlist.Clear();
+
+               if (e.Playlist != null)
+               {
+                   Track newtrack = null;
+                   foreach (string item in e.Playlist)
+                   {
+                       if (item.Contains("file:"))
+                       {
+                           if (newtrack != null)
+                               Playlist.Add(newtrack);
+                           newtrack = new Track();
+                       }
+                       else if (item.Contains("Artist:"))
+                           newtrack.Artist = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                       else if (item.Contains("Title:"))
+                           newtrack.Title = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                       else if (item.Contains("Album:"))
+                           newtrack.Album = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                   }
+               }
+               // TODO Tarkista, miksi ei lista päivity, vaikka on observable collection, jotta nullauksen voi ottaa pois
+               listBoxPlaylist.ItemsSource = null;
+               listBoxPlaylist.ItemsSource = Playlist;
+           });
+            Connection.MessagePass -= PlaylistFetched;
             Loading(false);
         }
 
@@ -391,6 +433,17 @@ namespace MPDCWP
             //listBoxSearchAlbum.ItemsSource = albums;
             //listBoxSearchTrack.ItemsSource = tracks;
             return null;
+        }
+
+        // If page is changed, check if it is playlist and if it is, fetch playlist
+        private void mainControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void appbar_buttonRefreshPlaylist_Click(object sender, EventArgs e)
+        {
+            GetPlaylist();
         }
     }
 }

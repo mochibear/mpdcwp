@@ -53,7 +53,7 @@
     <Compile Include="CreateConnectionAsyncArgs.cs" />
     <Compile Include="MPDClient.cs" />
     <Compile Include="NextEventArgs.cs" />
-    <Compile Include="PlaylistEventArgs.cs" />
+    <Compile Include="ListEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />

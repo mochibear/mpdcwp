@@ -45,7 +45,7 @@ namespace MPDCWP
         public PlaylistCollection()
             : base()
         {
-            Add(new Track() { Number = 1, Title = "Testikappale" });
-        }
+            
+        }        
     }
 }

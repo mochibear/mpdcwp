@@ -32,17 +32,23 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Collections.Generic;
 
 namespace MPDConnectLibrary
 {
     public class MPDClient
     {
+        // Buffer size
+        private const int bufferSize = 2048;
+
         // Next task args (command)
         private NextEventArgs nextArgs;
 
 
-        // After playlist is fetched
-        private EventHandler<PlaylistEventArgs> PlaylistFetched;
+        /// <summary>
+        /// After message is received pass it on
+        /// </summary>
+        public EventHandler<ListEventArgs> MessagePass;
 
 
         // Connection socket
@@ -127,8 +133,8 @@ namespace MPDConnectLibrary
             get { return nextArgs; }
             set { nextArgs = value; }
         }
-        
-        
+
+
         /// <summary>
         /// Connection established
         /// </summary>
@@ -150,7 +156,7 @@ namespace MPDConnectLibrary
             set { server = value; }
         }
 
-        
+
         /// <summary>
         /// Server port
         /// </summary>
@@ -160,7 +166,7 @@ namespace MPDConnectLibrary
             set { port = value; }
         }
 
-        
+
         /// <summary>
         /// Server username
         /// </summary>
@@ -170,7 +176,7 @@ namespace MPDConnectLibrary
             set { username = value; }
         }
 
-        
+
         /// <summary>
         /// Server password
         /// </summary>
@@ -186,7 +192,7 @@ namespace MPDConnectLibrary
         /// </summary>
         public bool IsConnected
         {
-            get { if (this.connection != null) return this.connection.Connected; else return false; }            
+            get { if (this.connection != null) return this.connection.Connected; else return false; }
         }
 
 
@@ -213,7 +219,7 @@ namespace MPDConnectLibrary
             this.connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             var connectionOperation = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(serverAddress, port) };
-            connectionOperation.Completed += OnConnectionToServerCompleted;            
+            connectionOperation.Completed += OnConnectionToServerCompleted;
             this.connection.ConnectAsync(connectionOperation);
         }
 
@@ -236,9 +242,10 @@ namespace MPDConnectLibrary
                 NextTaskToPorform(this, nextArgs);
                 this.NextTaskToPorform = null;
             }
+            StartReceivingMessages();
         }
 
-        
+
         /// <summary>
         /// Disconnect
         /// Close socket and release all associated resources
@@ -259,14 +266,23 @@ namespace MPDConnectLibrary
             this.SendCommand(command, new string[] { singleAttribute });
         }
 
-        
+
+        public void StartReceivingMessages()
+        {
+            SocketAsyncEventArgs responseListener = new SocketAsyncEventArgs();
+            responseListener.Completed += OnMessageReceivedFromServer;
+            byte[] responseBuffer = new byte[bufferSize];
+            responseListener.SetBuffer(responseBuffer, 0, bufferSize);
+            connection.ReceiveAsync(responseListener);
+        }
+
 
         /// <summary>
         /// Send given command and parameters to the server
         /// </summary>
         /// <param name="command">Command</param>
         /// <param name="attributes">Attributes</param>
-        public void SendCommand(string command, string[] attributes = null, EventHandler<SocketAsyncEventArgs> eventCompleted = null)
+        public void SendCommand(string command, string[] attributes = null)
         {
             if (this.IsConnected)
             {
@@ -283,15 +299,13 @@ namespace MPDConnectLibrary
                 var asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.server, this.port) };
 
                 var buffer = Encoding.UTF8.GetBytes(sb.ToString() + Environment.NewLine);
-                if (eventCompleted != null)
-                    asyncEvent.Completed += eventCompleted;
-                else
+                
                     asyncEvent.Completed += asyncEvent_Completed;
                 asyncEvent.SetBuffer(buffer, 0, buffer.Length);
                 connection.SendAsync(asyncEvent);
             }
             else
-            {               
+            {
                 this.nextArgs = new NextEventArgs(command, attributes);
                 this.NextTaskToPorform += MPDClient_NextTaskToPorform;
                 this.Connect();
@@ -302,11 +316,49 @@ namespace MPDConnectLibrary
         // Asynchronic command sending completed
         private void asyncEvent_Completed(object sender, SocketAsyncEventArgs e)
         {
-            if (MessageReceived != null)
+
+        }
+
+
+
+        private string trailingMessage;
+        private void OnMessageReceivedFromServer(object sender, SocketAsyncEventArgs e)
+        {           
+            string message = Encoding.UTF8.GetString(e.Buffer, 0, e.BytesTransferred);
+
+            if (!string.IsNullOrWhiteSpace(trailingMessage))
             {
-                MessageReceived(this, new AsyncMessageEventArgs(Encoding.UTF8.GetString(e.Buffer, 0, e.BytesTransferred)));
-                MessageReceived = null;
+                message = trailingMessage + message;
+                trailingMessage = null;
             }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                // Connection lost            
+                return;
+            }
+
+            // Convert the received string into a string array
+            List<string> lines = new List<string>(message.Split("\n\r".ToCharArray(), StringSplitOptions.None));
+
+            if (lines.Count > 0)
+            {
+                string lastLine = lines[lines.Count - 1];
+                bool isBufferFull = !string.IsNullOrWhiteSpace(lastLine);
+                if (isBufferFull)
+                {
+                    trailingMessage = lastLine;
+                    lines.Remove(lastLine);
+                }
+
+                if (MessagePass != null)
+                {
+                    MessagePass(this, new ListEventArgs(lines.ToArray()));                    
+                }
+                
+            }
+            // Start listening for the next message
+            StartReceivingMessages();
         }
 
 
@@ -326,31 +378,6 @@ namespace MPDConnectLibrary
         public string GetStatus(string key)
         {
             return "pause"; // testidata
-        }
-
-
-        /// <summary>
-        /// Fetches the playlist
-        /// </summary>
-        /// <param name="playListFetched">After playlist fetched</param>
-        public void FetchPlaylist(EventHandler<PlaylistEventArgs> playListFetched)
-        {
-            this.PlaylistFetched += playListFetched;
-            this.SendCommand("playlistinfo", null, ParsePlaylist);
-        }
-
-
-        /// <summary>
-        /// To parse playlist from async message
-        /// </summary>
-        /// <param name="sender">Sender</param>
-        /// <param name="e">Args</param>
-        public void ParsePlaylist(object sender, SocketAsyncEventArgs e)
-        {
-            // TODO käy bufferi silmukassa läpi
-            string playListString = Encoding.UTF8.GetString(e.Buffer, 0, e.BytesTransferred);
-            if (PlaylistFetched != null)
-                PlaylistFetched(this, new PlaylistEventArgs(new string[2]));
         }
     }
 }
