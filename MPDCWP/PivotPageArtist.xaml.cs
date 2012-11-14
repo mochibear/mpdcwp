@@ -110,6 +110,7 @@ namespace MPDCWP
                 foreach (Track track in ((Album)fe.DataContext).Tracks)
                 {
                     (Application.Current as App).Playlist.Add(track);
+                    (Application.Current as App).Connection.SendCommand("add", ((Track)fe.DataContext).File);
                 }
             }
             else if (fe.DataContext is Artist)
@@ -117,6 +118,7 @@ namespace MPDCWP
                 foreach (Track track in ((Artist)fe.DataContext).GetAllTracksAsList())
                 {
                     (Application.Current as App).Playlist.Add(track);
+                    (Application.Current as App).Connection.SendCommand("add", ((Track)fe.DataContext).File);
                 }
             }
         }

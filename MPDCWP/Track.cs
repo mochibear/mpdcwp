@@ -37,6 +37,22 @@ namespace MPDCWP
     /// </summary>
     public class Track
     {
+
+        // Album
+        // "No album" is default
+        private string album = "No album";
+
+
+        // Artist
+        // "No artist" is default
+        private string artist = "No artist";
+
+
+        // Track title
+        // "No title" is default
+        private string title = "No title";
+
+
         /// <summary>
         /// Track ID in playlist
         /// </summary>
@@ -63,7 +79,12 @@ namespace MPDCWP
         /// <summary>
         /// Track title
         /// </summary>
-        public string Title { get; set; }
+        public string Title
+        {
+            get { return title; }
+            set { title = value; }
+        }
+
 
 
         /// <summary>
@@ -74,17 +95,26 @@ namespace MPDCWP
         {
             return Title;
         }
-
+        
 
         /// <summary>
         /// Track artist
         /// </summary>
-        public string Artist { get; set; }
+        public string Artist
+        {
+            get { return artist; }
+            set { artist = value; }
+        }
 
-       
+
         /// <summary>
         /// Track album
         /// </summary>
-        public string Album { get; set; }
+        public string Album
+        {
+            get { return album; }
+            set { album = value; }
+        }
+        
     }
 }

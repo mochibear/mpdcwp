@@ -202,6 +202,7 @@ namespace MPDCWP
                 // An unhandled exception has occurred; break into the debugger
                 System.Diagnostics.Debugger.Break();
             }
+            //e.Handled = true;
         }
 
         #region Phone application initialization

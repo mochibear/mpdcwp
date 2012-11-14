@@ -33,6 +33,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
+using MPDConnectLibrary;
 
 namespace MPDCWP
 {
@@ -46,6 +47,7 @@ namespace MPDCWP
         // Page is loaded, Values changed
         private bool loaded = false, valuesChanged = false;
 
+        private MPDClient connection;        
 
         /// <summary>
         /// Constructor
@@ -53,6 +55,7 @@ namespace MPDCWP
         public PageSettings()
         {
             InitializeComponent();
+            this.connection = (Application.Current as App).Connection;
             // TODO voisi toteuttaa TryGetValuella?
             if (IsolatedStorageSettings.ApplicationSettings.Contains("savepassword"))
                 checkBoxSavePassword.IsChecked = (bool)IsolatedStorageSettings.ApplicationSettings["savepassword"];
@@ -66,6 +69,8 @@ namespace MPDCWP
                 textBoxUsername.Text = (string)IsolatedStorageSettings.ApplicationSettings["username"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("password"))
                 textBoxPassword.Text = (string)IsolatedStorageSettings.ApplicationSettings["password"];
+
+            buttonDisconnect.IsEnabled = this.connection.IsConnected;
         }
 
 
@@ -78,25 +83,26 @@ namespace MPDCWP
             {
                 if (valuesChanged)
                 {
-                    (Application.Current as App).Connection.Username = textBoxUsername.Text;
-                    (Application.Current as App).Connection.Password = textBoxPassword.Text;
-                    (Application.Current as App).Connection.Server = textBoxServer.Text;
+                    connection.Username = textBoxUsername.Text;
+                    connection.Password = textBoxPassword.Text;
+                    connection.Server = textBoxServer.Text;
                     int value;
                     if (Int32.TryParse(textBoxPort.Text, out value))
-                        (Application.Current as App).Connection.Port = value;                    
+                        connection.Port = value;                    
                 }
 
-                (Application.Current as App).Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
-                (Application.Current as App).Connection.Connect();
+                connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
+                connection.Connect();
             }
         }
 
 
         // If connection is established we can go back to the main page
         private void Connection_CreateConnectionCompleted(object sender, MPDConnectLibrary.CreateConnectionAsyncArgs e)
-        {
+        {            
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
+                buttonDisconnect.IsEnabled = this.connection.IsConnected;
                 if (NavigationService.CanGoBack)
                     NavigationService.GoBack();
             });
@@ -256,6 +262,12 @@ namespace MPDCWP
             if (!loaded)
                 return;
             this.valuesChanged = true;
+        }
+
+        private void buttonDisconnect_Click(object sender, RoutedEventArgs e)
+        {
+            this.connection.Disconnect();
+            buttonDisconnect.IsEnabled = this.connection.IsConnected;
         }
     }
 }

@@ -21,6 +21,10 @@
  * 
  * TODO Status/State mukaan, onko soitto päällä vai ei
  * TODO Hae soitettavan kappaleen indeksi
+ * TODO Uudelleenyhdistettäessä voisi miettiä muuttujien tyhjäämistä, jos esimerkiksi palvelinta on muutettu
+ * TODO Muuta artistit dictionaryyn
+ * 
+ * 
  */
 using System;
 using System.Collections.Generic;
@@ -196,6 +200,16 @@ namespace MPDCWP
         }
 
 
+        // Override
+        // When navigated to mainpage, stop loading (progressindicator) if connection is lost
+        protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            if (!this.Connection.IsConnected)
+                Loading(false);
+        }
+
+
         // TODO Jotta ei ladata joka kerta kuvaa, mutta huomataan, jos albumi vaihtuu
         // Load current album image
         private void LoadCurrentImage()
@@ -317,6 +331,12 @@ namespace MPDCWP
                         Int32.TryParse(item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1)), out number);
                         newtrack.Number = number;
                     }
+                    else if (item.StartsWith("Time:"))
+                    {
+                        int number = 0;
+                        Int32.TryParse(item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1)), out number);
+                        newtrack.Length = number;
+                    }
                     else if (item.StartsWith("Genre:"))
                     {
 
@@ -333,44 +353,77 @@ namespace MPDCWP
         private void DivideTracks()
         {
             Artists.Clear();
+            Artist lastArtist = null; // Nopeuttamaan hakua
             foreach (Track track in AllTracks)
             {
-                bool artistFound = false;
-                foreach (Artist artist in Artists)
+                if (lastArtist != null && lastArtist.Name.Equals(track.Artist))
                 {
-                    if (artist.Name.Equals(track.Artist))
+                    lastArtist.AddSong(track);
+                }
+                else
+                {
+                    bool artistFound = false;
+                    foreach (Artist artist in Artists)
                     {
-                        bool albumFound = false;
-                        foreach (Album album in artist.Albums)
+                        if (artist.Name.Equals(track.Artist))
                         {
-                            if (album.Title.Equals(track.Album))
-                            {
-                                album.Tracks.Add(track);
-                                albumFound = true;
-                                break;
-                            }
-                            if (!albumFound)
-                            {
-                                Album newalbum = new Album() { Title = track.Album };
-                                newalbum.Tracks.Add(track);
-                                artist.Albums.Add(newalbum);
-                            }
+                            artist.AddSong(track);
+                            lastArtist = artist;
+                            artistFound = true;
+                            break;
                         }
-                        artistFound = true;
-                        break;
+                    }
+                    if (!artistFound)
+                    {
+                        Artist newartist = new Artist() { Name = track.Artist };
+                        newartist.AddSong(track);
+                        Artists.Add(newartist);
                     }
                 }
-                if (!artistFound)
-                {
-                    Artist artist = new Artist() { Name = track.Artist };
-                    Artists.Add(artist);
-                    Album album = new Album() { Title = track.Album };
-                    artist.Albums.Add(album);
-                    album.Tracks.Add(track);
-                }
             }
-            listBoxBrowse.ItemsSource = null;
-            listBoxBrowse.ItemsSource = Artists;
+
+
+
+            //    bool artistFound = false;
+
+
+
+
+            //    foreach (Artist artist in Artists)
+            //    {
+            //        if (artist.Name.Equals(track.Artist))
+            //        {
+            //            bool albumFound = false;
+            //            foreach (Album album in artist.Albums)
+            //            {
+            //                if (album.Title.Equals(track.Album))
+            //                {
+            //                    album.Tracks.Add(track);
+            //                    albumFound = true;
+            //                    break;
+            //                }
+            //                if (!albumFound)
+            //                {
+            //                    Album newalbum = new Album() { Title = track.Album };
+            //                    newalbum.Tracks.Add(track);
+            //                    artist.Albums.Add(newalbum);
+            //                }
+            //            }
+            //            artistFound = true;
+            //            break;
+            //        }
+            //    }
+            //    if (!artistFound)
+            //    {
+            //        Artist newartist = new Artist() { Name = track.Artist };
+            //        Artists.Add(newartist);
+            //        Album album = new Album() { Title = track.Album };
+            //        newartist.Albums.Add(album);
+            //        album.Tracks.Add(track);
+            //    }
+            //}
+            //listBoxBrowse.ItemsSource = null;
+            //listBoxBrowse.ItemsSource = Artists;
         }
 
 
@@ -439,6 +492,12 @@ namespace MPDCWP
                         newtrack.ID = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
                         tracks.Add(newtrack);
                         newtrack = new Track();
+                    }
+                    else if (item.StartsWith("Time:"))
+                    {
+                        int number = 0;
+                        Int32.TryParse(item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1)), out number);
+                        newtrack.Length = number;
                     }
                 }
                 return tracks;

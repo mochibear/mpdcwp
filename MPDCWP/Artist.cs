@@ -81,5 +81,20 @@ namespace MPDCWP
             }
             return tracks;
         }
+
+        internal void AddSong(Track track)
+        {
+            foreach (Album album in albums)
+            {
+                if (album.Title.Equals(track.Album))
+                {
+                    album.Tracks.Add(track);
+                    return;
+                }
+            }
+            Album newalbum = new Album() { Title = track.Album };
+            albums.Add(newalbum);
+
+        }
     }
 }

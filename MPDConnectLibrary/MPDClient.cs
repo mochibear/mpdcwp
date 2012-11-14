@@ -193,8 +193,8 @@ namespace MPDConnectLibrary
                 this.Disconnect();
             this.connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            var connectionOperation = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(serverAddress, port) };
-            connectionOperation.Completed += OnConnectionToServerCompleted;
+            SocketAsyncEventArgs connectionOperation = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(serverAddress, port) };
+            connectionOperation.Completed += OnConnectionToServerCompleted;            
             this.connection.ConnectAsync(connectionOperation);
         }
 
@@ -209,14 +209,14 @@ namespace MPDConnectLibrary
 
                 return;
             }
-
-            if (CreateConnectionCompleted != null)
-                CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(true, "Success"));
+            
             if (NextTaskToPorform != null && nextArgs != null)
             {
                 NextTaskToPorform(this, nextArgs);
                 this.NextTaskToPorform = null;
             }
+            else if (CreateConnectionCompleted != null)
+                CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(true, "Success"));
             StartReceivingMessages();
         }
 
@@ -246,7 +246,7 @@ namespace MPDConnectLibrary
         /// Start receiving messages
         /// </summary>
         public void StartReceivingMessages()
-        {
+        {            
             SocketAsyncEventArgs responseListener = new SocketAsyncEventArgs();
             responseListener.Completed += OnMessageReceivedFromServer;
             byte[] responseBuffer = new byte[bufferSize];
@@ -272,9 +272,9 @@ namespace MPDConnectLibrary
                         sb.Append(" " + attr);
                     }
                 }
-                var asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.Server, this.Port) };
+                SocketAsyncEventArgs asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.Server, this.Port) };
 
-                var buffer = Encoding.UTF8.GetBytes(sb.ToString() + Environment.NewLine);
+                byte[] buffer = Encoding.UTF8.GetBytes(sb.ToString() + Environment.NewLine);
                 
                     asyncEvent.Completed += asyncEvent_Completed;
                 asyncEvent.SetBuffer(buffer, 0, buffer.Length);

@@ -187,6 +187,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
             <CheckBox Content="Auto connect" Grid.Row="7" Height="72" HorizontalAlignment="Left"  Name="checkBoxAutoConnect" VerticalAlignment="Top" Grid.RowSpan="2" Checked="checkBoxAutoConnect_Checked" Unchecked="checkBoxAutoConnect_Unchecked"/>
             <Button x:Name="buttonConnect" Content="Connect" HorizontalAlignment="Left" Margin="10,6,0,0" Grid.Row="9" VerticalAlignment="Top" Click="buttonConnect_Click"/>
             <CheckBox Content="Test mode" Grid.Row="8" Grid.RowSpan="2" Height="72" HorizontalAlignment="Left" Name="checkBoxTestMode" VerticalAlignment="Top" Checked="checkBoxTestMode_Checked" Unchecked="checkBoxTestMode_Unchecked" />
+            <Button Content="Disconnect" HorizontalAlignment="Left" Margin="280,6,0,0" Name="buttonDisconnect" VerticalAlignment="Top" Grid.ColumnSpan="2" Grid.Row="9" Click="buttonDisconnect_Click" />
         </Grid>
     </Grid>
 
