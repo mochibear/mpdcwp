@@ -22,7 +22,7 @@
  * TODO Status/State mukaan, onko soitto päällä vai ei
  * TODO Hae soitettavan kappaleen indeksi
  * TODO Uudelleenyhdistettäessä voisi miettiä muuttujien tyhjäämistä, jos esimerkiksi palvelinta on muutettu
- * TODO Muuta artistit dictionaryyn
+ * TODO Jos refreshaa playlistin ladataan myös database
  * 
  * 
  */
@@ -114,7 +114,7 @@ namespace MPDCWP
         /// <summary>
         /// All artists
         /// </summary>
-        public List<Artist> Artists { get { return (Application.Current as App).Artists; } set { (Application.Current as App).Artists = value; } }
+        public Dictionary<string, Artist> Artists { get { return (Application.Current as App).Artists; } set { (Application.Current as App).Artists = value; } }
 
 
         /// <summary>
@@ -173,8 +173,6 @@ namespace MPDCWP
             listBoxSearch.ItemsSource = Artists;
             // TODO TryGetValue
 
-            if (IsolatedStorageSettings.ApplicationSettings.Contains("username"))
-                this.Connection.Username = (string)IsolatedStorageSettings.ApplicationSettings["username"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("password"))
                 this.Connection.Password = (string)IsolatedStorageSettings.ApplicationSettings["password"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("server"))
@@ -362,22 +360,15 @@ namespace MPDCWP
                 }
                 else
                 {
-                    bool artistFound = false;
-                    foreach (Artist artist in Artists)
+                    if (Artists.TryGetValue(track.Artist, out lastArtist))
                     {
-                        if (artist.Name.Equals(track.Artist))
-                        {
-                            artist.AddSong(track);
-                            lastArtist = artist;
-                            artistFound = true;
-                            break;
-                        }
+                        lastArtist.AddSong(track);
                     }
-                    if (!artistFound)
+                    else
                     {
-                        Artist newartist = new Artist() { Name = track.Artist };
-                        newartist.AddSong(track);
-                        Artists.Add(newartist);
+                        lastArtist = new Artist() { Name = track.Artist };
+                        lastArtist.AddSong(track);
+                        Artists.Add(track.Artist, lastArtist);
                     }
                 }
             }

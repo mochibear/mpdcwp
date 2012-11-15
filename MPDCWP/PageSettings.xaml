@@ -165,11 +165,9 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
                 <RowDefinition Height="80" />
                 <RowDefinition Height="28" />
                 <RowDefinition Height="80" />
-                <RowDefinition Height="28" />
-                <RowDefinition Height="80" />
                 <RowDefinition Height="65" />
                 <RowDefinition Height="65" />
-                <RowDefinition Height="65"/>
+                <RowDefinition Height="65" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Name="textBlockServer" Text="Server" Grid.Row="0" Grid.Column="0" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="55" />
@@ -177,17 +175,13 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
 
             <TextBlock Name="textBlockPort" Text="Port" Grid.Row="0" Grid.Column="1" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="37" />
             <TextBox Name="textBoxPort" Text="" Width="142" Grid.Row="1" Grid.Column="1" Style="{StaticResource TextBoxStyleSettings}" TextChanged="textBoxPort_TextChanged" InputScope="Number"  />
-
-            <TextBlock Name="textBlockUsername" Text="Username" Grid.Row="2" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="89" />
-            <TextBox Name="textBoxUsername" Text="" Grid.Row="3" Width="456" Grid.ColumnSpan="2" Style="{StaticResource TextBoxStyleSettings}" TextChanged="textBoxUsername_TextChanged" />
-
-            <TextBlock Name="textBlockPassword" Text="Password" Grid.Row="4" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="83" />
-            <TextBox Name="textBoxPassword" Text="" Width="456" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource TextBoxStyleSettings}" TextChanged="textBoxPassword_TextChanged" InputScope="Password" />
-            <CheckBox Content="Save password" Grid.Row="6" Height="72" HorizontalAlignment="Left"  Name="checkBoxSavePassword" VerticalAlignment="Top" Grid.RowSpan="2" Checked="checkBoxSavePassword_Checked" Unchecked="checkBoxSavePassword_Unchecked" />
-            <CheckBox Content="Auto connect" Grid.Row="7" Height="72" HorizontalAlignment="Left"  Name="checkBoxAutoConnect" VerticalAlignment="Top" Grid.RowSpan="2" Checked="checkBoxAutoConnect_Checked" Unchecked="checkBoxAutoConnect_Unchecked"/>
-            <Button x:Name="buttonConnect" Content="Connect" HorizontalAlignment="Left" Margin="10,6,0,0" Grid.Row="9" VerticalAlignment="Top" Click="buttonConnect_Click"/>
-            <CheckBox Content="Test mode" Grid.Row="8" Grid.RowSpan="2" Height="72" HorizontalAlignment="Left" Name="checkBoxTestMode" VerticalAlignment="Top" Checked="checkBoxTestMode_Checked" Unchecked="checkBoxTestMode_Unchecked" />
-            <Button Content="Disconnect" HorizontalAlignment="Left" Margin="280,6,0,0" Name="buttonDisconnect" VerticalAlignment="Top" Grid.ColumnSpan="2" Grid.Row="9" Click="buttonDisconnect_Click" />
+            <TextBlock Name="textBlockPassword" Text="Password" Grid.Row="2" Style="{StaticResource TextBlockStyleSettingsTitle}" Width="83" />
+            <TextBox Name="textBoxPassword" Text="" Width="456" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource TextBoxStyleSettings}" TextChanged="textBoxPassword_TextChanged" InputScope="Password" />
+            <CheckBox Content="Save password" Grid.Row="4" Height="72" HorizontalAlignment="Left"  Name="checkBoxSavePassword" VerticalAlignment="Top" Grid.RowSpan="2" Checked="checkBoxSavePassword_Checked" Unchecked="checkBoxSavePassword_Unchecked" />
+            <CheckBox Content="Auto connect" Grid.Row="5" Height="72" HorizontalAlignment="Left"  Name="checkBoxAutoConnect" VerticalAlignment="Top" Grid.RowSpan="2" Checked="checkBoxAutoConnect_Checked" Unchecked="checkBoxAutoConnect_Unchecked"/>
+            <Button x:Name="buttonConnect" Content="Connect" HorizontalAlignment="Left" Margin="10,6,0,0" Grid.Row="7" VerticalAlignment="Bottom" Click="buttonConnect_Click"/>
+            <CheckBox Content="Test mode" Grid.Row="6" Grid.RowSpan="2" Height="72" HorizontalAlignment="Left" Name="checkBoxTestMode" VerticalAlignment="Top" Checked="checkBoxTestMode_Checked" Unchecked="checkBoxTestMode_Unchecked" />
+            <Button Content="Disconnect" HorizontalAlignment="Left" Margin="280,6,0,0" Name="buttonDisconnect" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Grid.Row="7" Click="buttonDisconnect_Click" />
         </Grid>
     </Grid>
 

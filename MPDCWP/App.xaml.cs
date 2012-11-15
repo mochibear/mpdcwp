@@ -53,7 +53,7 @@ namespace MPDCWP
     public partial class App : Application
     {
         // Artists
-        private List<Artist> artists = new List<Artist>();
+        private Dictionary<string, Artist> artists = new Dictionary<string, Artist>();
 
 
         // Selected artist
@@ -97,7 +97,7 @@ namespace MPDCWP
         /// <summary>
         /// Artists
         /// </summary>
-        public List<Artist> Artists { get { return this.artists; } set { this.artists = value; } }
+        public Dictionary<string, Artist> Artists { get { return this.artists; } set { this.artists = value; } }
 
 
         // Playlist

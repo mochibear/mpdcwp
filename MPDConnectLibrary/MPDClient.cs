@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 
- * TODO status-komennolla state
- * 
  */
 using System;
 using System.Net;
@@ -36,6 +34,9 @@ using System.Collections.Generic;
 
 namespace MPDConnectLibrary
 {
+    /// <summary>
+    /// MPDCLient class is for connecting to MPD Server and passing commands and handling responses
+    /// </summary>
     public class MPDClient
     {
         // Buffer size
@@ -151,12 +152,6 @@ namespace MPDConnectLibrary
 
 
         /// <summary>
-        /// Server username
-        /// </summary>
-        public string Username { get; set; }
-
-
-        /// <summary>
         /// Server password
         /// </summary>
         public string Password { get; set; }
@@ -217,6 +212,8 @@ namespace MPDConnectLibrary
             }
             else if (CreateConnectionCompleted != null)
                 CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(true, "Success"));
+            if (Password != null && !Password.Equals(""))
+                this.SendCommand("password", Password);
             StartReceivingMessages();
         }
 

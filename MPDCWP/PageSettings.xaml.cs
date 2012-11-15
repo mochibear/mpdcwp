@@ -65,8 +65,6 @@ namespace MPDCWP
                 textBoxServer.Text = (string)IsolatedStorageSettings.ApplicationSettings["server"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
                 textBoxPort.Text = (int)IsolatedStorageSettings.ApplicationSettings["port"] + "";
-            if (IsolatedStorageSettings.ApplicationSettings.Contains("username"))
-                textBoxUsername.Text = (string)IsolatedStorageSettings.ApplicationSettings["username"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("password"))
                 textBoxPassword.Text = (string)IsolatedStorageSettings.ApplicationSettings["password"];
 
@@ -83,7 +81,6 @@ namespace MPDCWP
             {
                 if (valuesChanged)
                 {
-                    connection.Username = textBoxUsername.Text;
                     connection.Password = textBoxPassword.Text;
                     connection.Server = textBoxServer.Text;
                     int value;
@@ -147,11 +144,6 @@ namespace MPDCWP
                     else
                         IsolatedStorageSettings.ApplicationSettings.Add("port", value);
                 }
-
-                if (IsolatedStorageSettings.ApplicationSettings.Contains("username"))
-                    IsolatedStorageSettings.ApplicationSettings["username"] = textBoxUsername.Text;
-                else
-                    IsolatedStorageSettings.ApplicationSettings.Add("username", textBoxUsername.Text);
 
                 if (IsolatedStorageSettings.ApplicationSettings.Contains("password"))
                 {
