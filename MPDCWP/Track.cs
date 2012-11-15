@@ -115,6 +115,16 @@ namespace MPDCWP
             get { return album; }
             set { album = value; }
         }
-        
+
+
+        /// <summary>
+        /// Returns true, if term matches title, artist or album
+        /// </summary>
+        /// <param name="term">Search term</param>
+        /// <returns>If matches</returns>
+        public bool Find(string term)
+        {
+            return (Title.ToLower().Contains(term) || Artist.ToLower().Contains(term) || Album.ToLower().Contains(term));
+        }
     }
 }

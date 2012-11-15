@@ -39,13 +39,21 @@ namespace MPDCWP
     /// </summary>
     public class PlaylistCollection : ObservableCollection<Track>
     {
+        public bool Changed { get; set; }
+
         /// <summary>
         /// Constructor
         /// </summary>
         public PlaylistCollection()
             : base()
         {
-            
-        }        
+        }
+
+        public new void Add(Track item)
+        {
+            this.Changed = true;
+            base.Add(item);
+        }
+ 
     }
 }

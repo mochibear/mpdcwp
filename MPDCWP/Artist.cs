@@ -93,6 +93,7 @@ namespace MPDCWP
                 }
             }
             Album newalbum = new Album() { Title = track.Album };
+            newalbum.Tracks.Add(track);
             albums.Add(newalbum);
 
         }

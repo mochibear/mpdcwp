@@ -66,7 +66,18 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
                 <TextBlock Text="{Binding Title}" FontSize="30" x:Name="textBlockTrackTitle" />
             </StackPanel>
         </DataTemplate>
+        <DataTemplate x:Key="SearchItemTemplate">
+            <StackPanel>
+                <toolkit:ContextMenuService.ContextMenu>
+                    <toolkit:ContextMenu>
+                        <toolkit:MenuItem Header="Add to playlist" Click="ContextMenuItem_Click"/>
+                    </toolkit:ContextMenu>
+                </toolkit:ContextMenuService.ContextMenu>
+                <TextBlock Text="{Binding Title}" FontSize="30" x:Name="textBlockTrackTitle" />
+            </StackPanel>
+        </DataTemplate>
     </phone:PhoneApplicationPage.Resources>
+    
     
     
     
@@ -81,7 +92,6 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
                         <RowDefinition Height="49" />
                         <RowDefinition Height="197" />
                         <RowDefinition Height="289" />
-
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="177" />
@@ -123,8 +133,8 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
             <!-- Haku -->
             <controls:PivotItem x:Name="controlSearch" Header="search">
                 <Grid>
-                	<TextBox x:Name="textBoxSearch" Margin="8,8,8,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="75" />
-                	<ListBox Margin="8,83,8,8" ItemTemplate="{StaticResource ItemTemplate}" ItemsSource="{Binding Collection}" Name="listBoxSearch" /> <!-- Collection Blendiä varten-->
+                	<TextBox x:Name="textBoxSearch" Margin="8,8,8,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="75" TextChanged="textBoxSearch_TextChanged" />
+                	<ListBox Margin="8,83,8,8" ItemTemplate="{StaticResource SearchItemTemplate}" ItemsSource="{Binding Collection}" Name="listBoxSearch" SelectionChanged="listBoxSearch_SelectionChanged" />
                 </Grid>
             </controls:PivotItem>
             <!-- Test Mode -->

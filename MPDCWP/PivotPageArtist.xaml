@@ -53,13 +53,13 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
 				<Path Data="M97,-140" Fill="#FFF4F4F5" Height="0" Stretch="Fill" Stroke="Black" UseLayoutRounding="False" Width="0"/>
 			</StackPanel>
 		</DataTemplate>
-		<DataTemplate x:Key="TracksItemTemplate">
+        <DataTemplate x:Key="TracksItemTemplate">
+            <StackPanel Orientation="Horizontal">
             <toolkit:ContextMenuService.ContextMenu>
                 <toolkit:ContextMenu>
                     <toolkit:MenuItem Header="Add to playlist" Click="ContextMenuItem_Click"/>
                 </toolkit:ContextMenu>
-            </toolkit:ContextMenuService.ContextMenu>
-            <StackPanel Orientation="Horizontal">
+            </toolkit:ContextMenuService.ContextMenu>            
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="{Binding Number}" VerticalAlignment="Bottom"  FontSize="30" x:Name="textBlockTrackNumber" Visibility="{Binding Path=Number, Converter={StaticResource  NumberToVisibilityConverter}}" />
                     <TextBlock Text=". " VerticalAlignment="Bottom" FontSize="30" Visibility="{Binding ElementName=textBlockTrackNumber, Path=Visibility}" />
@@ -83,7 +83,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
             <!--Pivot item two-->
             <controls:PivotItem x:Name="pivotItemTracks" Header="tracks">
                 <Grid>
-                	<ListBox Margin="8" ItemTemplate="{StaticResource TracksItemTemplate}" ItemsSource="{Binding Tracks}" Name="listBoxTracks" />
+                    <ListBox Margin="8" ItemTemplate="{StaticResource TracksItemTemplate}" ItemsSource="{Binding Tracks}"  DataContext="{Binding}" Name="listBoxTracks" />
                 </Grid>
             </controls:PivotItem>
         </controls:Pivot>

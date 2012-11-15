@@ -22,8 +22,9 @@
  * TODO Status/State mukaan, onko soitto päällä vai ei
  * TODO Hae soitettavan kappaleen indeksi
  * TODO Uudelleenyhdistettäessä voisi miettiä muuttujien tyhjäämistä, jos esimerkiksi palvelinta on muutettu
- * TODO Jos refreshaa playlistin ladataan myös database
- * 
+ * TODO Jos refreshaa playlistin ladataan myös database?
+ * TODO Logi Appiin, test-ikkunan bind ja poikkeukset sinne 
+ * TODO Tarkistus, ollaanko online vai offline, siitä ilmoitus ja sen mukaan toimintojen esto
  * 
  */
 using System;
@@ -168,9 +169,7 @@ namespace MPDCWP
 
             if (loaded)
                 return;
-            //this.AddDemoData();
-            listBoxBrowse.ItemsSource = Artists;
-            listBoxSearch.ItemsSource = Artists;
+
             // TODO TryGetValue
 
             if (IsolatedStorageSettings.ApplicationSettings.Contains("password"))
@@ -205,6 +204,11 @@ namespace MPDCWP
             base.OnNavigatedTo(e);
             if (!this.Connection.IsConnected)
                 Loading(false);
+            if (Playlist.Changed)
+            {
+                GetPlaylist();
+                Playlist.Changed = false;
+            }
         }
 
 
@@ -293,6 +297,7 @@ namespace MPDCWP
                     listBoxSearch.ItemsSource = null;
                     listBoxSearch.ItemsSource = AllTracks;
                     DivideTracks();
+                    listBoxBrowse.ItemsSource = Artists.Values;
                 });
             }
         }
@@ -315,24 +320,24 @@ namespace MPDCWP
                         if (newtrack != null)
                             tracks.Add(newtrack);
                         newtrack = new Track();
-                        newtrack.File = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                        newtrack.File = item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2));
                     }
                     else if (item.StartsWith("Artist:"))
-                        newtrack.Artist = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                        newtrack.Artist = item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2));
                     else if (item.StartsWith("Title:"))
-                        newtrack.Title = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                        newtrack.Title = item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2));
                     else if (item.StartsWith("Album:"))
-                        newtrack.Album = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                        newtrack.Album = item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2));
                     else if (item.StartsWith("Track:"))
                     {
                         int number = 0;
-                        Int32.TryParse(item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1)), out number);
+                        Int32.TryParse(item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2)), out number);
                         newtrack.Number = number;
                     }
                     else if (item.StartsWith("Time:"))
                     {
                         int number = 0;
-                        Int32.TryParse(item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1)), out number);
+                        Int32.TryParse(item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2)), out number);
                         newtrack.Length = number;
                     }
                     else if (item.StartsWith("Genre:"))
@@ -372,57 +377,8 @@ namespace MPDCWP
                     }
                 }
             }
-
-
-
-            //    bool artistFound = false;
-
-
-
-
-            //    foreach (Artist artist in Artists)
-            //    {
-            //        if (artist.Name.Equals(track.Artist))
-            //        {
-            //            bool albumFound = false;
-            //            foreach (Album album in artist.Albums)
-            //            {
-            //                if (album.Title.Equals(track.Album))
-            //                {
-            //                    album.Tracks.Add(track);
-            //                    albumFound = true;
-            //                    break;
-            //                }
-            //                if (!albumFound)
-            //                {
-            //                    Album newalbum = new Album() { Title = track.Album };
-            //                    newalbum.Tracks.Add(track);
-            //                    artist.Albums.Add(newalbum);
-            //                }
-            //            }
-            //            artistFound = true;
-            //            break;
-            //        }
-            //    }
-            //    if (!artistFound)
-            //    {
-            //        Artist newartist = new Artist() { Name = track.Artist };
-            //        Artists.Add(newartist);
-            //        Album album = new Album() { Title = track.Album };
-            //        newartist.Albums.Add(album);
-            //        album.Tracks.Add(track);
-            //    }
-            //}
-            //listBoxBrowse.ItemsSource = null;
-            //listBoxBrowse.ItemsSource = Artists;
         }
 
-
-        // Possible sort method for all tracks
-        private void SortTracks()
-        {
-            // Sort
-        }
 
         /// <summary>
         /// Get playlist
@@ -471,23 +427,23 @@ namespace MPDCWP
                 foreach (string item in strings)
                 {
                     if (item.StartsWith("file:"))
-                        newtrack.File = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                        newtrack.File = item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2));
                     else if (item.StartsWith("Artist:"))
-                        newtrack.Artist = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                        newtrack.Artist = item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2));
                     else if (item.StartsWith("Title:"))
-                        newtrack.Title = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                        newtrack.Title = item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2));
                     else if (item.StartsWith("Album:"))
-                        newtrack.Album = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                        newtrack.Album = item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2));
                     else if (item.StartsWith("Id:"))
                     {
-                        newtrack.ID = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1));
+                        newtrack.ID = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 2));
                         tracks.Add(newtrack);
                         newtrack = new Track();
                     }
                     else if (item.StartsWith("Time:"))
                     {
                         int number = 0;
-                        Int32.TryParse(item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 1)), out number);
+                        Int32.TryParse(item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2)), out number);
                         newtrack.Length = number;
                     }
                 }
@@ -566,8 +522,28 @@ namespace MPDCWP
         // Perform quick search
         private void textBoxSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // TODO Tee viive, ennen kuin käynnistetään haku tai sitten haun keskeytys
-            //this.Find(textBoxSearch.Text);
+            // TODO Tee viive, ennen kuin käynnistetään haku tai sitten haun keskeytys tai mahdollisesti background workerilla, mille cancel mahdollisuus
+
+            List<Track> result = this.Find(textBoxSearch.Text);
+            Deployment.Current.Dispatcher.BeginInvoke(() => { listBoxSearch.ItemsSource = null; listBoxSearch.ItemsSource = result; });
+        }
+
+
+        /// <summary>
+        /// Finds tracks containing given term and return results as a IEnumerableList
+        /// </summary>
+        /// <param name="term">Search term</param>
+        /// <returns>Search results</returns>
+        public List<Track> Find(string term)
+        {
+            term = term.ToLower();
+            List<Track> tracksFound = new List<Track>();
+            foreach (Track track in (Application.Current as App).AllTracks)
+            {
+                if (track.Find(term))
+                    tracksFound.Add(track);
+            }
+            return tracksFound;
         }
 
 
@@ -589,6 +565,7 @@ namespace MPDCWP
         // If selection is a track, add it to the playlist.
         // If it is an album add all tracks to the playlist
         // If it is an artist add all tracks in all albums to the playlist
+        // TODO Directory-lisääminen
         private void ContextMenuItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = sender as MenuItem;
@@ -599,21 +576,24 @@ namespace MPDCWP
                 return;
             if (fe.DataContext is Track)
             {
-                this.Playlist.Add((Track)fe.DataContext);
+                Connection.SendCommand("add", ((Track)fe.DataContext).File);
+                GetPlaylist();
             }
             else if (fe.DataContext is Album)
             {
                 foreach (Track track in ((Album)fe.DataContext).Tracks)
                 {
-                    this.Playlist.Add(track);
+                    Connection.SendCommand("add", track.File);
                 }
+                GetPlaylist();
             }
             else if (fe.DataContext is Artist)
             {
                 foreach (Track track in ((Artist)fe.DataContext).GetAllTracksAsList())
                 {
-                    this.Playlist.Add(track);
+                    Connection.SendCommand("add", track.File);
                 }
+                GetPlaylist();
             }
         }
 
@@ -650,39 +630,6 @@ namespace MPDCWP
             Connection.SendCommand(MPDClient.PLAY);
         }
 
-
-        /// <summary>
-        /// Finds tracks containing given term and return results as a IEnumerableList
-        /// </summary>
-        /// <param name="term">Search term</param>
-        /// <returns>Search results</returns>
-        public IEnumerable<Track> Find(string term)
-        {
-            //str = str.ToLower();
-            //List<Artist> artists = new List<Artist>();
-            //List<Track> tracks = new List<Track>();
-            //List<Album> albums = new List<Album>();
-            //foreach (Artist artist in Artists)
-            //{
-            //    if (artist.Name.ToLower().Contains(str))
-            //        artists.Add(artist);
-            //    foreach (Album album in artist.Albums)
-            //    {
-            //        if (album.Title.ToLower().Contains(str))
-            //            albums.Add(album);
-            //        foreach (Track track in album.Tracks)
-            //        {
-            //            if (track.Title.ToLower().Contains(str))
-            //                tracks.Add(track);
-            //        }
-            //    }
-            //}
-
-            //listBoxSearchArtist.ItemsSource = artists;
-            //listBoxSearchAlbum.ItemsSource = albums;
-            //listBoxSearchTrack.ItemsSource = tracks;
-            return null;
-        }
 
         // If page is changed, check if it is playlist and if it is, fetch playlist
         private void mainControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -765,6 +712,11 @@ namespace MPDCWP
                 // TODO Nyt poistaa ensimmäisen olion, joka vastaa tätä. Voisi poistaa juuri sen oikean, jos esim. on useampia esiintymiä.
                 Playlist.Remove((fe.DataContext as Track));
             }
+        }
+
+        private void listBoxSearch_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

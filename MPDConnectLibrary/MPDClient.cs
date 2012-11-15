@@ -262,12 +262,16 @@ namespace MPDConnectLibrary
             if (this.IsConnected)
             {
                 StringBuilder sb = new StringBuilder(command);
+                string space = "";
                 if (attributes != null)
-                {                    
+                {
+                    sb.Append(" \"");
                     foreach (string attr in attributes)
                     {
-                        sb.Append(" " + attr);
+                        sb.Append(space + attr);
+                        space = " ";
                     }
+                    sb.Append("\"");
                 }
                 SocketAsyncEventArgs asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.Server, this.Port) };
 

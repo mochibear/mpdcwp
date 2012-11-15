@@ -31,6 +31,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
+using System.ComponentModel;
+using MPDConnectLibrary;
 
 namespace MPDCWP
 {
@@ -41,6 +43,10 @@ namespace MPDCWP
     /// </summary>
     public partial class PivotPageArtist : PhoneApplicationPage
     {
+        // Connection socket to server
+        private MPDClient connection = (Application.Current as App).Connection;
+
+
         /// <summary>
         /// Selected artist
         /// </summary>
@@ -102,26 +108,40 @@ namespace MPDCWP
                 return;
             if (fe.DataContext is Track)
             {
-                (Application.Current as App).Playlist.Add((Track)fe.DataContext);
-                (Application.Current as App).Connection.SendCommand("add", ((Track)fe.DataContext).File);
+//                (Application.Current as App).Playlist.Add((Track)fe.DataContext);
+                connection.SendCommand("add", ((Track)fe.DataContext).File);
             }
             else if (fe.DataContext is Album)
             {
                 foreach (Track track in ((Album)fe.DataContext).Tracks)
                 {
-                    (Application.Current as App).Playlist.Add(track);
-                    (Application.Current as App).Connection.SendCommand("add", ((Track)fe.DataContext).File);
+//                    (Application.Current as App).Playlist.Add(track);
+                    connection.SendCommand("add", track.File);
                 }
             }
             else if (fe.DataContext is Artist)
             {
                 foreach (Track track in ((Artist)fe.DataContext).GetAllTracksAsList())
                 {
-                    (Application.Current as App).Playlist.Add(track);
-                    (Application.Current as App).Connection.SendCommand("add", ((Track)fe.DataContext).File);
+//                    (Application.Current as App).Playlist.Add(track);
+                    connection.SendCommand("add", track.File);
                 }
             }
         }
 
+
+        // If back-button is pressed on tracks-page, go back to album list        
+        protected override void OnBackKeyPress(CancelEventArgs e)
+        {
+            if (pivotMain.SelectedItem == pivotItemTracks)
+            {
+                pivotMain.SelectedItem = pivotAlbums;
+                e.Cancel = true;
+            }
+            else
+            {
+                base.OnBackKeyPress(e);
+            }
+        }
     }
 }

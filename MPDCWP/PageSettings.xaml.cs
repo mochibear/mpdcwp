@@ -61,6 +61,8 @@ namespace MPDCWP
                 checkBoxSavePassword.IsChecked = (bool)IsolatedStorageSettings.ApplicationSettings["savepassword"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect"))
                 checkBoxAutoConnect.IsChecked = (bool)IsolatedStorageSettings.ApplicationSettings["autoconnect"];
+            if (IsolatedStorageSettings.ApplicationSettings.Contains("testmode"))
+                checkBoxTestMode.IsChecked = (bool)IsolatedStorageSettings.ApplicationSettings["testmode"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("server"))
                 textBoxServer.Text = (string)IsolatedStorageSettings.ApplicationSettings["server"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
@@ -125,6 +127,11 @@ namespace MPDCWP
                     IsolatedStorageSettings.ApplicationSettings["autoconnect"] = checkBoxAutoConnect.IsChecked;
                 else
                     IsolatedStorageSettings.ApplicationSettings.Add("autoconnect", checkBoxAutoConnect.IsChecked);
+
+                if (IsolatedStorageSettings.ApplicationSettings.Contains("testmode"))
+                    IsolatedStorageSettings.ApplicationSettings["testmode"] = checkBoxTestMode.IsChecked;
+                else
+                    IsolatedStorageSettings.ApplicationSettings.Add("testmode", checkBoxTestMode.IsChecked);
 
                 if (IsolatedStorageSettings.ApplicationSettings.Contains("testmode"))
                     IsolatedStorageSettings.ApplicationSettings["testmode"] = checkBoxTestMode.IsChecked;
