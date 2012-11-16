@@ -51,10 +51,22 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <TextBlock HorizontalAlignment="Center" Name="textBlockAuthor" Text="Matti Ahinko" VerticalAlignment="Top" FontSize="50" />
-            <TextBlock FontSize="30" HorizontalAlignment="Center" Name="textBlockYear" Text="2012" VerticalAlignment="Top" Margin="198,51,194,0" />
-            <TextBlock FontSize="30" HorizontalAlignment="Center" Margin="6,108,6,0" Name="textBlockEmail" Text="matti.m.ahinko@student.jyu.fi" VerticalAlignment="Top" Width="444" TextAlignment="Center" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="124" />
+                <RowDefinition Height="93*" />
+                <RowDefinition Height="44*" />
+                <RowDefinition Height="50*" />
+                <RowDefinition Height="308*" />
+            </Grid.RowDefinitions>
+            <TextBlock FontSize="50" Grid.Row="0" HorizontalAlignment="Center" Margin="6,6,6,0" Name="textBlockTitle" Text="MPD Client" VerticalAlignment="Top" Width="444" TextAlignment="Center" />
+            <TextBlock FontSize="50" HorizontalAlignment="Center" Name="textBlockPlatform" Text="Windows Phone 7" VerticalAlignment="Bottom" Width="456" TextAlignment="Center" />
+            <TextBlock Height="30" Grid.Row="0"  HorizontalAlignment="Left" Margin="7,53,0,0" Name="textBlockFor" Text="for" VerticalAlignment="Top" Width="443" TextAlignment="Center" />
+            <TextBlock HorizontalAlignment="Center" Grid.Row="1" Name="textBlockAuthor" Text="Matti Ahinko" VerticalAlignment="Top" FontSize="50" Margin="0,33,6,0" Width="450" TextAlignment="Center" Tap="textBlockEmail_Tap" />
+            <TextBlock FontSize="30" Grid.Row="3" HorizontalAlignment="Center" Name="textBlockYear" Text="2012" VerticalAlignment="Top" Margin="7,8,0,0" Width="449" TextAlignment="Center" />
+            <TextBlock FontSize="30" Grid.Row="2" HorizontalAlignment="Center" Margin="9,6,3,0" Name="textBlockEmail" Text="matti.m.ahinko@student.jyu.fi" VerticalAlignment="Top" Width="444" TextAlignment="Center" Tap="textBlockEmail_Tap" />
+            <TextBlock FontSize="18" Grid.Row="4" HorizontalAlignment="Center" Name="textBlockUrl" Text="https://trac.cc.jyu.fi/projects/gko/wiki/2012/mpdcwp" TextAlignment="Center" VerticalAlignment="Bottom" Width="444" Margin="0,0,0,40" Tap="textBlockUrl_Tap" />
         </Grid>
+
     </Grid>
  
     <!--Sample code showing usage of ApplicationBar-->

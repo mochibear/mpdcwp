@@ -97,11 +97,11 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
                         <ColumnDefinition Width="177" />
                         <ColumnDefinition Width="266" />
                     </Grid.ColumnDefinitions>
-                    <!-- DataTemplate ja StackPanel!!!! -->
+                    <!-- Voisi laittaa bindauksella ja muuttujan soitettavaa kappaletta varten -->
                     <StackPanel Grid.Row="1" Grid.Column="2" Margin="5,0,0,0">
-                        <TextBlock HorizontalAlignment="Left" Name="textBlockSong" Text="Lightning Song" VerticalAlignment="Top" Width="213" TextWrapping="Wrap" />
-                        <TextBlock HorizontalAlignment="Left" Name="textBlockArtist" Text="Anathema" VerticalAlignment="Top" Width="213" TextWrapping="Wrap" />
-                        <TextBlock HorizontalAlignment="Left" Name="textBlockAlbum" Text="Weather Systems" VerticalAlignment="Top" Width="213" TextWrapping="Wrap" />
+                        <TextBlock HorizontalAlignment="Left" Name="textBlockSong" Text="{Binding ElementName=CurrentTrack, Path=Title}" VerticalAlignment="Top" Width="213" TextWrapping="Wrap" />
+                        <TextBlock HorizontalAlignment="Left" Name="textBlockArtist" Text="" VerticalAlignment="Top" Width="213" TextWrapping="Wrap" />
+                        <TextBlock HorizontalAlignment="Left" Name="textBlockAlbum" Text="" VerticalAlignment="Top" Width="213" TextWrapping="Wrap" />
 
                     </StackPanel>
                     <my1:PlayerControl Grid.ColumnSpan="2" Grid.Row="2" HorizontalAlignment="Left" Margin="16,5,0,0" Name="playerControl" VerticalAlignment="Top" Play="playerControl_Play" Pause="playerControl_Pause" Previous="playerControl_Previous" Rewind="playerControl_Rewind" Stop="playerControl_Stop" Next="playerControl_Next" Forward="playerControl_Forward" VolumeChanged="playerControl_VolumeChanged" />

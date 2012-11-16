@@ -31,6 +31,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
+using Microsoft.Phone.Tasks;
 
 namespace MPDCWP
 {
@@ -47,6 +48,22 @@ namespace MPDCWP
         public PageInfo()
         {
             InitializeComponent();
+        }
+
+        private void textBlockUrl_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            WebBrowserTask webBrowserTask = new WebBrowserTask() { Uri = new Uri("https://trac.cc.jyu.fi/projects/gko/wiki/2012/mpdcwp") };
+            webBrowserTask.Show();
+        }
+
+        private void textBlockEmail_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            EmailComposeTask emailComposeTask = new EmailComposeTask
+            {
+                To = "matti.m.ahinko@student.jyu.fi",
+                Subject = "MPD Client for Windows Phone 7",
+            };
+            emailComposeTask.Show();
         }
     }
 }
