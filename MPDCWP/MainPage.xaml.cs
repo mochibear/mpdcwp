@@ -185,12 +185,15 @@ namespace MPDCWP
                 this.TestMode = (bool)IsolatedStorageSettings.ApplicationSettings["testmode"];
             if (TestMode)
             {
+                if (!mainControl.Items.Contains(controlTestMode))
+                    mainControl.Items.Add(controlTestMode);
                 if (Connection != null && Connection.TestMessagesReceived == null)
                     Connection.TestMessagesReceived += TestMessagesReceived;
                 controlTestMode.Visibility = System.Windows.Visibility.Visible;
             }
             else
             {
+                mainControl.Items.Remove(controlTestMode);
                 if (Connection != null)
                     Connection.TestMessagesReceived = null;
                 controlTestMode.Visibility = System.Windows.Visibility.Collapsed;
@@ -207,8 +210,6 @@ namespace MPDCWP
                 this.Connection.Server = (string)IsolatedStorageSettings.ApplicationSettings["server"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
                 this.Connection.Port = (int)IsolatedStorageSettings.ApplicationSettings["port"];
-            if (IsolatedStorageSettings.ApplicationSettings.Contains("testmode"))
-                this.TestMode = (bool)IsolatedStorageSettings.ApplicationSettings["testmode"];
             this.Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
             this.Connection.CreateConnectionFailed += Connection_CreateConnectionFailed;
 
@@ -303,6 +304,7 @@ namespace MPDCWP
         private void MainPage_GetAllTracks(object sender, EventArgs e)
         {
             this.GetAllTracks();
+            getAllTracksEvent -= MainPage_GetAllTracks;
         }
 
 
