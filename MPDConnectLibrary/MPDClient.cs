@@ -55,6 +55,10 @@ namespace MPDConnectLibrary
         private Socket connection;
 
 
+        // Is client connecting
+        public bool Connecting { get; private set; }
+
+
         /// <summary>
         /// After message is received pass it on
         /// </summary>
@@ -186,6 +190,7 @@ namespace MPDConnectLibrary
                 return;
             if (this.IsConnected)
                 this.Disconnect();
+            this.Connecting = true;
             this.connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             SocketAsyncEventArgs connectionOperation = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(serverAddress, port) };
@@ -212,6 +217,7 @@ namespace MPDConnectLibrary
             }
             else if (CreateConnectionCompleted != null)
                 CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(true, "Success"));
+            this.Connecting = false;
             if (Password != null && !Password.Equals(""))
                 this.SendCommand("password", Password);
             StartReceivingMessages();

@@ -68,7 +68,7 @@ namespace MPDCWP
             if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
                 textBoxPort.Text = (int)IsolatedStorageSettings.ApplicationSettings["port"] + "";
             if (IsolatedStorageSettings.ApplicationSettings.Contains("password"))
-                textBoxPassword.Text = (string)IsolatedStorageSettings.ApplicationSettings["password"];
+                passwordBoxPassword.Password = (string)IsolatedStorageSettings.ApplicationSettings["password"];
 
             buttonDisconnect.IsEnabled = this.connection.IsConnected;
         }
@@ -83,7 +83,7 @@ namespace MPDCWP
             {
                 if (valuesChanged)
                 {
-                    connection.Password = textBoxPassword.Text;
+                    connection.Password = passwordBoxPassword.Password;
                     connection.Server = textBoxServer.Text;
                     int value;
                     if (Int32.TryParse(textBoxPort.Text, out value))
@@ -228,17 +228,8 @@ namespace MPDCWP
         }
 
 
-        // Username text changed
-        private void textBoxUsername_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (!loaded)
-                return;
-            this.valuesChanged = true;
-        }
-
-
         // Password text changed
-        private void textBoxPassword_TextChanged(object sender, TextChangedEventArgs e)
+        private void passwordBoxPassword_PasswordChanged(object sender, RoutedEventArgs e)
         {
             if (!loaded)
                 return;

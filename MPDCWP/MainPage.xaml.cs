@@ -22,10 +22,10 @@
  * TODO Status/State mukaan, onko soitto päällä vai ei
  * TODO Hae soitettavan kappaleen indeksi
  * TODO Uudelleenyhdistettäessä voisi miettiä muuttujien tyhjäämistä, jos esimerkiksi palvelinta on muutettu
- * TODO Jos refreshaa playlistin ladataan myös database?
- * TODO Logi Appiin, test-ikkunan bind ja poikkeukset sinne 
  * TODO Tarkistus, ollaanko online vai offline, siitä ilmoitus ja sen mukaan toimintojen esto
  * TODO Pollaus kappaleen vaihtoa varten yms. "currentsong"
+ * TODO Soittolista clearaa, kun lisätään search-listilta kappale
+ * TODO Hyödynnä Connecting, jotta ei tule päällekkäisiä kutsuja
  * 
  */
 using System;
@@ -55,7 +55,7 @@ namespace MPDCWP
     public partial class MainPage : PhoneApplicationPage
     {
         // Page loaded, something is being loaded, Is test mode enabled
-        private bool loaded, loading, testmode;
+        private bool loaded, loading;
 
 
         // Temporary list for downloading playlist lines
@@ -79,12 +79,24 @@ namespace MPDCWP
 
 
         /// <summary>
+        /// If app is in test mode
+        /// </summary>
+        public bool TestMode { get; private set; }
+
+
+        /// <summary>
         /// Current track
         /// </summary>
         public Track CurrentTrack
         {
             get { return (Track)GetValue(currentTrackProperty); }
-            set { SetValue(currentTrackProperty, value); }
+            set {
+                SetValue(currentTrackProperty, value);
+                // TODO Bindaus
+                textBlockAlbum.Text = value.Album;
+                textBlockArtist.Text = value.Artist;
+                textBlockSong.Text = value.Title;
+            }
         }
 
         // Using a DependencyProperty as the backing store for currentTrack.  This enables animation, styling, binding, etc...
@@ -170,8 +182,8 @@ namespace MPDCWP
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             if (IsolatedStorageSettings.ApplicationSettings.Contains("testmode"))
-                this.testmode = (bool)IsolatedStorageSettings.ApplicationSettings["testmode"];
-            if (testmode)
+                this.TestMode = (bool)IsolatedStorageSettings.ApplicationSettings["testmode"];
+            if (TestMode)
             {
                 if (Connection != null && Connection.TestMessagesReceived == null)
                     Connection.TestMessagesReceived += TestMessagesReceived;
@@ -187,7 +199,7 @@ namespace MPDCWP
             if (loaded)
                 return;
 
-            // TODO TryGetValue
+            // TODO Voisi miettiä TryGetValue
 
             if (IsolatedStorageSettings.ApplicationSettings.Contains("password"))
                 this.Connection.Password = (string)IsolatedStorageSettings.ApplicationSettings["password"];
@@ -196,7 +208,7 @@ namespace MPDCWP
             if (IsolatedStorageSettings.ApplicationSettings.Contains("port"))
                 this.Connection.Port = (int)IsolatedStorageSettings.ApplicationSettings["port"];
             if (IsolatedStorageSettings.ApplicationSettings.Contains("testmode"))
-                this.testmode = (bool)IsolatedStorageSettings.ApplicationSettings["testmode"];
+                this.TestMode = (bool)IsolatedStorageSettings.ApplicationSettings["testmode"];
             this.Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
             this.Connection.CreateConnectionFailed += Connection_CreateConnectionFailed;
 
@@ -331,6 +343,7 @@ namespace MPDCWP
         }
 
 
+        // Parses all tracks from strings to a list of Tracks
         // TODO Voisi miettiä viitteillä toteuttamista myös
         // TODO directory: -> artist/album tällöin voi lisätä myös koko kansiollisen samalla add-käskyllä
         private List<Track> ParseAllTracks(List<string> strings)
@@ -638,7 +651,6 @@ namespace MPDCWP
             if (fe.DataContext is Track)
             {
                 Connection.SendCommand("add", ((Track)fe.DataContext).File);
-                GetPlaylist();
             }
             else if (fe.DataContext is Album)
             {
@@ -646,7 +658,6 @@ namespace MPDCWP
                 {
                     Connection.SendCommand("add", track.File);
                 }
-                GetPlaylist();
             }
             else if (fe.DataContext is Artist)
             {
@@ -654,8 +665,8 @@ namespace MPDCWP
                 {
                     Connection.SendCommand("add", track.File);
                 }
-                GetPlaylist();
             }
+            GetPlaylist();
         }
 
 
@@ -750,9 +761,15 @@ namespace MPDCWP
             }
         }
 
+
+        // If searchlist selection has been changed
         private void listBoxSearch_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            // Siirretty contextiin
+            //Track track = (listBoxSearch.SelectedItem as Track);
+            //if (track == null)
+            //    return;
+            //Connection.SendCommand("add", track.File);
         }
     }
 }
