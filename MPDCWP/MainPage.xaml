@@ -134,7 +134,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
             <controls:PivotItem x:Name="controlSearch" Header="search">
                 <Grid>
                 	<TextBox x:Name="textBoxSearch" Margin="8,8,8,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="75" TextChanged="textBoxSearch_TextChanged" />
-                	<ListBox Margin="8,83,8,8" ItemTemplate="{StaticResource SearchItemTemplate}" ItemsSource="{Binding Collection}" Name="listBoxSearch" SelectionChanged="listBoxSearch_SelectionChanged" />
+                	<ListBox Margin="8,83,8,8" ItemTemplate="{StaticResource SearchItemTemplate}" ItemsSource="{Binding Collection}" Name="listBoxSearch" />
                 </Grid>
             </controls:PivotItem>
             <!-- Test Mode -->

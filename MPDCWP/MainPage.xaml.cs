@@ -24,7 +24,7 @@
  * TODO Uudelleenyhdistettäessä voisi miettiä muuttujien tyhjäämistä, jos esimerkiksi palvelinta on muutettu
  * TODO Tarkistus, ollaanko online vai offline, siitä ilmoitus ja sen mukaan toimintojen esto
  * TODO Pollaus kappaleen vaihtoa varten yms. "currentsong"
- * TODO Soittolista clearaa, kun lisätään search-listilta kappale
+ * TODO Soittolista ei päivity, kun lisätään search-listilta kappale
  * TODO Hyödynnä Connecting, jotta ei tule päällekkäisiä kutsuja
  * 
  */
@@ -99,7 +99,9 @@ namespace MPDCWP
             }
         }
 
-        // Using a DependencyProperty as the backing store for currentTrack.  This enables animation, styling, binding, etc...
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for currentTrack.
+        /// </summary>
         public static readonly DependencyProperty currentTrackProperty =
             DependencyProperty.Register("currentTrack", typeof(Track), typeof(MainPage), new PropertyMetadata(null));
 
@@ -227,8 +229,11 @@ namespace MPDCWP
         }
 
 
-        // Override
-        // When navigated to mainpage, stop loading (progressindicator) if connection is lost
+        /// <summary>
+        /// When navigated to mainpage, stop loading (progressindicator) if connection is lost
+        /// Overridden
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -428,6 +433,7 @@ namespace MPDCWP
         /// </summary>
         private void GetPlaylist()
         {
+            Loading(true, "Loading playlist...");
             Connection.MessagePass += PlaylistFetched;
             playlistLines.Clear();
             Connection.SendCommand("playlistinfo");
@@ -683,15 +689,14 @@ namespace MPDCWP
         // If page is changed, check if it is playlist and if it is, fetch playlist
         private void mainControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //if (mainControl.SelectedItem == pivotItemBrowse && !artistsDivided)
-            //    DivideTracks();
+            //if (mainControl.SelectedItem == pivotItemPlaylist)
+            //    GetPlaylist();
         }
 
 
         // Refresh playlist
         private void appbar_buttonRefreshPlaylist_Click(object sender, EventArgs e)
-        {
-            Loading(true, "Loading playlist...");
+        {            
             GetPlaylist();
         }
 
@@ -761,17 +766,6 @@ namespace MPDCWP
                 // TODO Nyt poistaa ensimmäisen olion, joka vastaa tätä. Voisi poistaa juuri sen oikean, jos esim. on useampia esiintymiä.
                 Playlist.Remove((fe.DataContext as Track));
             }
-        }
-
-
-        // If searchlist selection has been changed
-        private void listBoxSearch_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // Siirretty contextiin
-            //Track track = (listBoxSearch.SelectedItem as Track);
-            //if (track == null)
-            //    return;
-            //Connection.SendCommand("add", track.File);
         }
     }
 }

@@ -130,7 +130,10 @@ namespace MPDCWP
         }
 
 
-        // If back-button is pressed on tracks-page, go back to album list        
+        /// <summary>
+        /// Overridden, if Back key is pressed
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnBackKeyPress(CancelEventArgs e)
         {
             if (pivotMain.SelectedItem == pivotItemTracks)

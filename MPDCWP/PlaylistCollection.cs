@@ -39,6 +39,9 @@ namespace MPDCWP
     /// </summary>
     public class PlaylistCollection : ObservableCollection<Track>
     {
+        /// <summary>
+        /// If collection is changed
+        /// </summary>
         public bool Changed { get; set; }
 
         /// <summary>
@@ -49,6 +52,10 @@ namespace MPDCWP
         {
         }
 
+        /// <summary>
+        /// Add item
+        /// </summary>
+        /// <param name="item">Item</param>
         public new void Add(Track item)
         {
             this.Changed = true;
