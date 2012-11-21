@@ -69,7 +69,7 @@ namespace MPDConnectLibrary
         /// After message is received pass it on for test mode
         /// </summary>
         public EventHandler<MessageArrayEventArgs> TestMessagesReceived;
-        
+
 
         /// <summary>
         /// Next command
@@ -144,6 +144,12 @@ namespace MPDConnectLibrary
 
 
         /// <summary>
+        /// After normal command is completed
+        /// </summary>
+        public event EventHandler PostCommand;
+
+
+        /// <summary>
         /// Server address
         /// </summary>
         public string Server { get; set; }
@@ -175,7 +181,8 @@ namespace MPDConnectLibrary
         /// </summary>
         public void Connect()
         {
-            this.Connect(this.Server, this.Port);
+            if (!Connecting)
+                this.Connect(this.Server, this.Port);
         }
 
 
@@ -194,7 +201,7 @@ namespace MPDConnectLibrary
             this.connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             SocketAsyncEventArgs connectionOperation = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(serverAddress, port) };
-            connectionOperation.Completed += OnConnectionToServerCompleted;            
+            connectionOperation.Completed += OnConnectionToServerCompleted;
             this.connection.ConnectAsync(connectionOperation);
         }
 
@@ -202,14 +209,14 @@ namespace MPDConnectLibrary
         // Connection completed
         private void OnConnectionToServerCompleted(object sender, SocketAsyncEventArgs e)
         {
+            this.Connecting = false;
             if (e.SocketError != SocketError.Success)
             {
                 if (CreateConnectionFailed != null)
                     CreateConnectionFailed(this, new CreateConnectionAsyncArgs(false, e.SocketError.ToString()));
-
                 return;
             }
-            
+
             if (NextTaskToPorform != null && nextArgs != null)
             {
                 NextTaskToPorform(this, nextArgs);
@@ -217,7 +224,6 @@ namespace MPDConnectLibrary
             }
             else if (CreateConnectionCompleted != null)
                 CreateConnectionCompleted(this, new CreateConnectionAsyncArgs(true, "Success"));
-            this.Connecting = false;
             if (Password != null && !Password.Equals(""))
                 this.SendCommand("password", Password);
             StartReceivingMessages();
@@ -249,7 +255,7 @@ namespace MPDConnectLibrary
         /// Start receiving messages
         /// </summary>
         public void StartReceivingMessages()
-        {            
+        {
             SocketAsyncEventArgs responseListener = new SocketAsyncEventArgs();
             responseListener.Completed += OnMessageReceivedFromServer;
             byte[] responseBuffer = new byte[bufferSize];
@@ -282,8 +288,8 @@ namespace MPDConnectLibrary
                 SocketAsyncEventArgs asyncEvent = new SocketAsyncEventArgs { RemoteEndPoint = new DnsEndPoint(this.Server, this.Port) };
 
                 byte[] buffer = Encoding.UTF8.GetBytes(sb.ToString() + Environment.NewLine);
-                
-                    asyncEvent.Completed += asyncEvent_Completed;
+
+                asyncEvent.Completed += asyncEvent_Completed;
                 asyncEvent.SetBuffer(buffer, 0, buffer.Length);
                 connection.SendAsync(asyncEvent);
             }
@@ -299,13 +305,17 @@ namespace MPDConnectLibrary
         // Asynchronic command sending completed
         private void asyncEvent_Completed(object sender, SocketAsyncEventArgs e)
         {
-
+            if (PostCommand != null)
+            {
+                PostCommand(this, new EventArgs());
+                PostCommand = null;
+            }
         }
 
-        
+
         // When message received from server
         private void OnMessageReceivedFromServer(object sender, SocketAsyncEventArgs e)
-        {           
+        {
             string message = Encoding.UTF8.GetString(e.Buffer, 0, e.BytesTransferred);
 
             if (!string.IsNullOrWhiteSpace(trailingMessage))
@@ -336,17 +346,17 @@ namespace MPDConnectLibrary
                 MessageArrayEventArgs args = new MessageArrayEventArgs(lines.ToArray());
                 if (MessagePass != null)
                 {
-                    MessagePass(this, args);                    
+                    MessagePass(this, args);
                 }
                 if (MessageReceived != null)
                 {
-                    MessageReceived(this, args); 
+                    MessageReceived(this, args);
                 }
                 if (TestMessagesReceived != null)
                 {
                     TestMessagesReceived(this, args);
                 }
-                
+
             }
             // Start listening for the next message
             StartReceivingMessages();

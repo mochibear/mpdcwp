@@ -39,12 +39,10 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
     xmlns:my="clr-namespace:MPDCWP"
     xmlns:my1="clr-namespace:MusicPlayerLibrary;assembly=MusicPlayerLibrary"
     xmlns:my2="clr-namespace:ImageDownloaderLibrary;assembly=ImageDownloaderLibrary"
-    xmlns:SampleData="clr-namespace:Expression.Blend.SampleData.SampleDataSource"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     >
 
     <phone:PhoneApplicationPage.Resources>
-        <SampleData:SampleDataSource x:Key="sampleDataSource" d:IsDataSource="True"/>
         <DataTemplate x:Key="ItemTemplate">
         	<StackPanel>
                 <toolkit:ContextMenuService.ContextMenu>
@@ -82,7 +80,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
     
     
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <Grid x:Name="LayoutRoot" Background="Transparent" d:DataContext="{Binding Source={StaticResource sampleDataSource}}">
+    <Grid x:Name="LayoutRoot" Background="Transparent" d:DataContext="{Binding}">
         <!--Pivot Control-->
         <controls:Pivot Title="MPD CLient" x:Name="mainControl" SelectionChanged="mainControl_SelectionChanged">
             <!--Pivot item one-->
@@ -105,7 +103,7 @@ along with MPDCWP.  If not, see <http://www.gnu.org/licenses/>.
 
                     </StackPanel>
                     <my1:PlayerControl Grid.ColumnSpan="2" Grid.Row="2" HorizontalAlignment="Left" Margin="16,5,0,0" Name="playerControl" VerticalAlignment="Top" Play="playerControl_Play" Pause="playerControl_Pause" Previous="playerControl_Previous" Rewind="playerControl_Rewind" Stop="playerControl_Stop" Next="playerControl_Next" Forward="playerControl_Forward" VolumeChanged="playerControl_VolumeChanged" />
-                    <my2:ImageDownloader Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" Name="imageDownloader1" VerticalAlignment="Top" Height="160" Width="160" KeyWord="productImage" />
+                    <my2:ImageDownloader Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0" Name="imageDownloader" VerticalAlignment="Top" Height="160" Width="160" KeyWord="productImage" AutoDownload="True" AutoLoad="True" AutoParse="True" />
                     <TextBlock  HorizontalAlignment="Left" Margin="3,5,0,0" Name="textBlockStatus" Text="Stopped" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="440" Height="40" />
                 </Grid>
             </controls:PivotItem>

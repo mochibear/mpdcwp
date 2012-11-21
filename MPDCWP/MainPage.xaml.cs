@@ -20,12 +20,10 @@
  *
  * 
  * TODO Status/State mukaan, onko soitto päällä vai ei
- * TODO Hae soitettavan kappaleen indeksi
  * TODO Uudelleenyhdistettäessä voisi miettiä muuttujien tyhjäämistä, jos esimerkiksi palvelinta on muutettu
  * TODO Tarkistus, ollaanko online vai offline, siitä ilmoitus ja sen mukaan toimintojen esto
- * TODO Pollaus kappaleen vaihtoa varten yms. "currentsong"
- * TODO Soittolista ei päivity, kun lisätään search-listilta kappale
- * TODO Hyödynnä Connecting, jotta ei tule päällekkäisiä kutsuja
+ * TODO Pollaus kappaleen vaihtoa varten yms. "currentsong" tai vaihtoehtoisesti lasketaan aikaa ja verrataan sitä soitettuun aikaan ja tehdään sen mukaan kappaleiden näennäiset vaihdot yms.
+ * TODO Hyödynnä Connection.Connecting -propertyä, jotta ei tule päällekkäisiä kutsuja
  * 
  */
 using System;
@@ -55,7 +53,7 @@ namespace MPDCWP
     public partial class MainPage : PhoneApplicationPage
     {
         // Page loaded, something is being loaded, Is test mode enabled
-        private bool loaded, loading;
+        private bool loaded, loading, playlistOutdated, paused;
 
 
         // Temporary list for downloading playlist lines
@@ -90,7 +88,8 @@ namespace MPDCWP
         public Track CurrentTrack
         {
             get { return (Track)GetValue(currentTrackProperty); }
-            set {
+            set
+            {
                 SetValue(currentTrackProperty, value);
                 // TODO Bindaus
                 textBlockAlbum.Text = value.Album;
@@ -247,20 +246,6 @@ namespace MPDCWP
         }
 
 
-        // TODO Jotta ei ladata joka kerta kuvaa, mutta huomataan, jos albumi vaihtuu
-        // Load current album image
-        private void LoadCurrentImage()
-        {
-            try
-            {
-                imageDownloader1.ImagePageUrl = imageSourceUrl + CurrentTrack.Artist.ToLower().Replace(" ", "+") + "+" + CurrentTrack.Album.ToLower().Replace(" ", "+");
-            }
-            catch (NullReferenceException)
-            {
-            }
-        }
-
-
         // Set playcontrol page's info texts
         private void SetInfo(Track track)
         {
@@ -299,7 +284,7 @@ namespace MPDCWP
                 PlayerStatus = "Connection established to " + Connection.Server;
             });
             this.Loading(true, "Loading playlist");
-            Deployment.Current.Dispatcher.BeginInvoke(() => { Playlist.Clear(); });
+            //Deployment.Current.Dispatcher.BeginInvoke(() => { Playlist.Clear(); });
             getAllTracksEvent += MainPage_GetAllTracks;
             GetPlaylist();
         }
@@ -448,7 +433,7 @@ namespace MPDCWP
             playlistLines.AddRange(e.MessageArray);
             if (e.MessageArray.Contains("OK"))
             {
-                List<Track> tracks = ParseTracks(e.MessageArray);
+                List<Track> tracks = ParseTracks(playlistLines);
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     Playlist.Clear();
@@ -467,7 +452,7 @@ namespace MPDCWP
 
         // TODO Voisi miettiä viitteillä toteuttamista myös
         // Parse tracks from string array
-        private List<Track> ParseTracks(string[] strings)
+        private List<Track> ParseTracks(List<string> strings)
         {
             if (strings != null)
             {
@@ -485,7 +470,7 @@ namespace MPDCWP
                         newtrack.Album = item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2));
                     else if (item.StartsWith("Id:"))
                     {
-                        newtrack.ID = item.Substring(item.IndexOf(":") + 1, item.Length - (item.IndexOf(":") + 2));
+                        newtrack.ID = item.Substring(item.IndexOf(":") + 2, item.Length - (item.IndexOf(":") + 2));
                         tracks.Add(newtrack);
                         newtrack = new Track();
                     }
@@ -516,20 +501,20 @@ namespace MPDCWP
             }
             else
             {
-                if (this.playerControl.Playing)
-                    Connection.SendCommand(MPDClient.PAUSE);
-                else
+                if (listBoxPlaylist.SelectedIndex == -1)
                 {
-                    if (listBoxPlaylist.SelectedIndex == -1)
-                        CurrentTrack = (Track)listBoxPlaylist.Items[0];
-                    else
-                        CurrentTrack = (Track)listBoxPlaylist.SelectedItem;
-
-                    Connection.SendCommand(MPDClient.PLAY);
-                    PlayerStatus = "Playing";
-                    // TODO Tarkistus, vaihtuuko albumi
-                    LoadCurrentImage();
+                    listBoxPlaylist.SelectedIndex = 0;
                 }
+
+                if (this.paused)
+                {
+                    Connection.SendCommand(MPDClient.PAUSE);
+                    this.paused = false;
+                }
+                else
+                    Connection.SendCommand(MPDClient.PLAY);
+                
+                PlayerStatus = "Playing";
             }
         }
 
@@ -538,6 +523,7 @@ namespace MPDCWP
         private void playerControl_Pause(object sender, EventArgs e)
         {
             Connection.SendCommand(MPDClient.PAUSE);
+            this.paused = true;
             PlayerStatus = "Paused";
         }
 
@@ -545,7 +531,10 @@ namespace MPDCWP
         // Player control previous
         private void playerControl_Previous(object sender, EventArgs e)
         {
-            Connection.SendCommand(MPDClient.PREVIOUS);
+            if (listBoxPlaylist.Items.Count <= 0)
+                return;
+            //Connection.SendCommand(MPDClient.PREVIOUS);
+            listBoxPlaylist.SelectedIndex = (listBoxPlaylist.Items.Count + (listBoxPlaylist.SelectedIndex - 1)) % listBoxPlaylist.Items.Count;
             PlayerStatus = "Previous";
         }
 
@@ -553,6 +542,7 @@ namespace MPDCWP
         // Player control pauses
         private void playerControl_Rewind(object sender, EventArgs e)
         {
+            // TODO calculate hold time
             PlayerStatus = "Rewind";
         }
 
@@ -568,8 +558,10 @@ namespace MPDCWP
         // Player control next
         private void playerControl_Next(object sender, EventArgs e)
         {
+            if (listBoxPlaylist.Items.Count <= 0)
+                return;
             // Connection.SendCommand(MPDClient.NEXT);
-
+            listBoxPlaylist.SelectedIndex = (listBoxPlaylist.SelectedIndex + 1) % listBoxPlaylist.Items.Count;
             PlayerStatus = "Next";
         }
 
@@ -577,6 +569,7 @@ namespace MPDCWP
         // Player control forward
         private void playerControl_Forward(object sender, EventArgs e)
         {
+            // TODO calculate hold time            
             PlayerStatus = "Forward";
         }
 
@@ -585,7 +578,7 @@ namespace MPDCWP
         private void playerControl_VolumeChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Connection.SendCommand(MPDClient.SETVOL, e.NewValue + "");
-            PlayerStatus = "VolumeChanged: " + e.NewValue;
+            PlayerStatus = "VolumeChanged: " + String.Format("{0:0.00}%", e.NewValue);
         }
 
 
@@ -674,7 +667,13 @@ namespace MPDCWP
                     Connection.SendCommand("add", track.File);
                 }
             }
-            GetPlaylist();
+            this.playlistOutdated = true;
+        }
+
+        // After sending command, fetch playlist
+        void Connection_GetPlaylist(object sender, EventArgs e)
+        {
+            this.GetPlaylist();
         }
 
 
@@ -689,14 +688,17 @@ namespace MPDCWP
         // If page is changed, check if it is playlist and if it is, fetch playlist
         private void mainControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //if (mainControl.SelectedItem == pivotItemPlaylist)
-            //    GetPlaylist();
+            if ((mainControl.SelectedItem == pivotItemPlaylist || mainControl.SelectedItem == pivotItemPlayer) && playlistOutdated)
+            {
+                GetPlaylist();
+                playlistOutdated = false;
+            }
         }
 
 
         // Refresh playlist
         private void appbar_buttonRefreshPlaylist_Click(object sender, EventArgs e)
-        {            
+        {
             GetPlaylist();
         }
 
@@ -710,8 +712,10 @@ namespace MPDCWP
             Track track = (Track)listBoxPlaylist.SelectedItem;
             if (track == null)
                 return;
+            if (CurrentTrack == null || (CurrentTrack != null && !CurrentTrack.Album.Equals(track.Album)))
+                imageDownloader.ImagePageUrl = imageSourceUrl + track.Artist.ToLower().Replace(" ", "+") + "+" + track.Album.ToLower().Replace(" ", "+");
             CurrentTrack = track;
-            Connection.SendCommand("playid", track.ID);
+            Connection.SendCommand("playid", track.ID); // TODO kaikilla raidoilla sama track id
         }
 
 

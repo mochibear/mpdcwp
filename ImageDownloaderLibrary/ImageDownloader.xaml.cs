@@ -52,7 +52,13 @@ namespace ImageDownloaderLibrary
 
 
         // Url of image and page and keyword for parse
-        private string imageUrl, keyWord, imagePageUrl;
+        private string imageUrl, imagePageUrl;
+
+
+        /// <summary>
+        /// Is image downloaded
+        /// </summary>
+        public bool ImageDownloaded { get; private set; }
 
 
         /// <summary>
@@ -61,53 +67,32 @@ namespace ImageDownloaderLibrary
         /// </summary>
         [Browsable(true),
         DescriptionAttribute("Keyword for image search")]
-        public string KeyWord
-        {
-            get { return keyWord; }
-            set { keyWord = value; }
-        }
-        
+        public string KeyWord { get; set; }        
         
         /// <summary>
         /// Image which is shown
         /// </summary>
-        public BitmapImage ImageSource
-        {
-            get { return imageSource; }
-            set { imageSource = value; }
-        }
+        public BitmapImage ImageSource { get; set; }
         
         
         /// <summary>
         /// If image will be downloaded automatically
         /// </summary>
         [Browsable(true)]
-        public bool AutoDownload
-        {
-            get { return autoDownload; }
-            set { autoDownload = value; }
-        }
+        public bool AutoDownload { get; set; }
         
 
         /// <summary>
         /// If image will be loaded automatically
         /// </summary>
         [Browsable(true)]
-        public bool AutoLoad
-        {
-            get { return autoLoad; }
-            set { autoLoad = value; }
-        }
+        public bool AutoLoad { get; set; }
 
         
         /// <summary>
         /// If page containing the image will be parsed automatically
         /// </summary>
-        public bool AutoParse
-        {
-            get { return autoParse; }
-            set { autoParse = value; }
-        }
+        public bool AutoParse { get; set; }
         
         
         /// <summary>
@@ -120,6 +105,7 @@ namespace ImageDownloaderLibrary
             set { ChangeImageUrl(value); }
         }
 
+
         
         /// <summary>
         /// Url of the page containing the image
@@ -129,6 +115,7 @@ namespace ImageDownloaderLibrary
             get { return imagePageUrl; }
             set { ChangeImagePageUrl(value); }
         }
+
         
         
         /// <summary>
@@ -209,13 +196,24 @@ namespace ImageDownloaderLibrary
 
 
         /// <summary>
+        /// Parse image url from current page url
+        /// </summary>
+        public void GetImageUrl()
+        {
+            if (this.ImagePageUrl != null)
+                this.GetImageUrl(this.ImagePageUrl);
+        }
+
+
+        /// <summary>
         /// Parses url of the image
         /// </summary>
         /// <param name="urlToParse">Url to parse</param>
         /// <exception cref="NullReferenceException">Keyword is null</exception>
         public void GetImageUrl(string urlToParse)
         {
-            if (keyWord == null)
+            this.ImageDownloaded = false;
+            if (KeyWord == null)
                 throw new NullReferenceException("Keyword is null");
             if (webClientPageToParse != null)
                 webClientPageToParse.CancelAsync();
@@ -236,7 +234,7 @@ namespace ImageDownloaderLibrary
                 while (!reader.EndOfStream && !found)
                 {
                     line = reader.ReadLine();
-                    if (line.Contains(this.keyWord) && line.ToLower().Contains("src="))
+                    if (line.Contains(this.KeyWord) && line.ToLower().Contains("src="))
                     {
                         string tmp = line.Substring(line.IndexOf("src=") + 5);
                         this.imageUrl = tmp.Substring(0, tmp.IndexOf("\""));
@@ -257,12 +255,25 @@ namespace ImageDownloaderLibrary
 
 
         /// <summary>
+        /// Get image from current url
+        /// </summary>
+        public void GetImage()
+        {
+            if (this.ImageUrl != null)
+                this.GetImage(this.ImageUrl);
+            else
+                this.GetImageUrl();
+        }
+
+
+        /// <summary>
         /// Downloads and changes image of the control
         /// </summary>
         /// <exception cref="BadImageFormatException">If image is in bad format, exception will be thrown</exception>
         /// <param name="imageUrl">Url of the image</param>
         public void GetImage(string imageUrl)
         {
+            this.ImageDownloaded = false;
             if (webClientGetImage != null)
                 webClientGetImage.CancelAsync();
             webClientGetImage = new WebClient();
@@ -284,6 +295,7 @@ namespace ImageDownloaderLibrary
                         ImageDownloadSucceeded(this, new RoutedEventArgs());
                     if (autoLoad)
                         image.Source = imageSource;
+                    this.ImageDownloaded = true;
                 }
                 catch (BadImageFormatException ex)
                 {

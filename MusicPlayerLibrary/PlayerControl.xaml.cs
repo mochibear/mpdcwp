@@ -40,13 +40,13 @@ namespace MusicPlayerLibrary
     public partial class PlayerControl : UserControl
     {
         // If playing
-        private bool playing = false, hold = false;
+        private bool hold = false;
 
 
         /// <summary>
         /// Is control in Playing mode
         /// </summary>
-        public bool Playing { get { return this.playing; } }
+        public bool Playing { get; private set; }
 
 
         /// <summary>
@@ -150,7 +150,13 @@ namespace MusicPlayerLibrary
         /// </summary>
         [Browsable(true),
         DescriptionAttribute("Background of next button")]
-        public Brush NextBackground { set { this.buttonNext.Background = value; } get { return this.buttonNext.Background; } }        
+        public Brush NextBackground { set { this.buttonNext.Background = value; } get { return this.buttonNext.Background; } }
+
+
+        /// <summary>
+        /// Is playback paused
+        /// </summary>
+        public bool Paused { get; private set; }
 
         
         /// <summary>
@@ -174,7 +180,8 @@ namespace MusicPlayerLibrary
                 if (args.Cancel)
                     return;
             }
-            playing = true;
+            Playing = true;
+            this.Paused = false;
             buttonPlay.Visibility = System.Windows.Visibility.Collapsed;
             buttonPause.Visibility = System.Windows.Visibility.Visible;
         }
@@ -188,6 +195,7 @@ namespace MusicPlayerLibrary
                 Pause(this, new EventArgs());
             buttonPlay.Visibility = System.Windows.Visibility.Visible;
             buttonPause.Visibility = System.Windows.Visibility.Collapsed;
+            this.Paused = true;
         }
 
 
@@ -197,7 +205,7 @@ namespace MusicPlayerLibrary
         {
             if (Stop != null)
                 Stop(this, new EventArgs());
-            playing = false;
+            Playing = false;
             buttonPlay.Visibility = System.Windows.Visibility.Visible;
             buttonPause.Visibility = System.Windows.Visibility.Collapsed;
         }
@@ -236,7 +244,7 @@ namespace MusicPlayerLibrary
         private void buttonNext_Hold(object sender, GestureEventArgs e)
         {
             hold = true;
-            if (playing && Forward != null)
+            if (Playing && Forward != null)
                 Forward(this, new EventArgs());
         }
 
@@ -246,7 +254,7 @@ namespace MusicPlayerLibrary
         private void buttonPrevious_Hold(object sender, GestureEventArgs e)
         {
             hold = true;
-            if (playing && Rewind != null)
+            if (Playing && Rewind != null)
                 Rewind(this, new EventArgs());
         }
 
