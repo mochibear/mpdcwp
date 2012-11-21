@@ -34,6 +34,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using MPDConnectLibrary;
+using Microsoft.Phone.Shell;
 
 namespace MPDCWP
 {
@@ -47,7 +48,18 @@ namespace MPDCWP
         // Page is loaded, Values changed
         private bool loaded = false, valuesChanged = false;
 
-        private MPDClient connection;        
+
+        // Progressbar
+        private ProgressIndicator progressIndicator;
+
+
+        // Is system loading
+        private bool loading = false;
+
+
+        // Connection to server
+        private MPDClient connection;
+
 
         /// <summary>
         /// Constructor
@@ -55,6 +67,15 @@ namespace MPDCWP
         public PageSettings()
         {
             InitializeComponent();
+
+            SystemTray.SetIsVisible(this, false);
+            SystemTray.SetOpacity(this, 0.5);
+            progressIndicator = new ProgressIndicator();
+            progressIndicator.IsVisible = false;
+            progressIndicator.IsIndeterminate = true;
+            progressIndicator.Text = "Loading...";
+            SystemTray.SetProgressIndicator(this, progressIndicator);
+
             this.connection = (Application.Current as App).Connection;
             // TODO voisi toteuttaa TryGetValuella?
             if (IsolatedStorageSettings.ApplicationSettings.Contains("savepassword"))
@@ -74,11 +95,27 @@ namespace MPDCWP
         }
 
 
+        // Loading indicator
+        private void Loading(bool loading, string text = "Loading...")
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                this.loading = loading;
+                progressIndicator.Text = text;
+                SystemTray.SetIsVisible(this, loading);
+                progressIndicator.IsVisible = loading;
+            });
+        }
+
+
         // Button connect clicked
         // If values are changed use new values in connection
         // Connect to the server
         private void buttonConnect_Click(object sender, RoutedEventArgs e)
         {
+            this.buttonConnect.IsEnabled = false;
+            this.buttonDisconnect.IsEnabled = false;
+            this.Loading(true);
             if (!textBoxServer.Text.Equals("") && !textBoxPort.Text.Equals(""))
             {
                 if (valuesChanged)
@@ -98,9 +135,11 @@ namespace MPDCWP
 
         // If connection is established we can go back to the main page
         private void Connection_CreateConnectionCompleted(object sender, MPDConnectLibrary.CreateConnectionAsyncArgs e)
-        {            
+        {
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
+                this.buttonConnect.IsEnabled = true;
+                this.Loading(false);
                 buttonDisconnect.IsEnabled = this.connection.IsConnected;
                 if (NavigationService.CanGoBack)
                     NavigationService.GoBack();
@@ -254,8 +293,15 @@ namespace MPDCWP
             this.valuesChanged = true;
         }
 
+        // Disconnect button pressed
         private void buttonDisconnect_Click(object sender, RoutedEventArgs e)
         {
+            this.Loading(false);
+            (Application.Current as App).Playlist.Clear();            
+            //(Application.Current as App).AllTracks.Clear();
+            (Application.Current as App).Artists.Clear();
+            (Application.Current as App).SelectedArtist = null;
+            this.buttonConnect.IsEnabled = true;
             this.connection.Disconnect();
             buttonDisconnect.IsEnabled = this.connection.IsConnected;
         }

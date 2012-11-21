@@ -52,8 +52,8 @@ namespace MPDCWP
     /// </summary>
     public partial class MainPage : PhoneApplicationPage
     {
-        // Page loaded, something is being loaded, Is test mode enabled
-        private bool loaded, loading, playlistOutdated, paused;
+        // Page loaded, something is being loaded, Is test mode enabled, if paused, if asked for connection at start
+        private bool loaded, loading, playlistOutdated, paused, askedConnectionAtStart;
 
 
         // Temporary list for downloading playlist lines
@@ -214,16 +214,23 @@ namespace MPDCWP
             this.Connection.CreateConnectionCompleted += Connection_CreateConnectionCompleted;
             this.Connection.CreateConnectionFailed += Connection_CreateConnectionFailed;
 
-            if (!Connection.IsConnected && (!IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect") || !(bool)IsolatedStorageSettings.ApplicationSettings["autoconnect"]))
+            if (!askedConnectionAtStart)
             {
-                if (MessageBox.Show("Not connected to server. Connect now?", "Connection", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-                    NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
+                if (!Connection.IsConnected && (!IsolatedStorageSettings.ApplicationSettings.Contains("autoconnect") || !(bool)IsolatedStorageSettings.ApplicationSettings["autoconnect"]))
+                {
+                    if (MessageBox.Show("Not connected to server. Connect now?", "Connection", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                    {
+                        askedConnectionAtStart = true;
+                        NavigationService.Navigate(new Uri("/PageSettings.xaml", UriKind.Relative));
+                    }
+                }
+                else
+                {
+                    this.Loading(true, "Connecting to server...");
+                    this.Connection.Connect();
+                }
             }
-            else
-            {
-                this.Loading(true, "Connecting to server...");
-                this.Connection.Connect();
-            }
+            askedConnectionAtStart = true;
             this.loaded = true;
         }
 
@@ -235,14 +242,17 @@ namespace MPDCWP
         /// <param name="e"></param>
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            base.OnNavigatedTo(e);
             if (!this.Connection.IsConnected)
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() => {(Application.Current as App).AllTracks.Clear(); });
                 Loading(false);
-            if (Playlist.Changed)
+            }
+            else if (Playlist.Changed)
             {
                 GetPlaylist();
                 Playlist.Changed = false;
             }
+            base.OnNavigatedTo(e);
         }
 
 
