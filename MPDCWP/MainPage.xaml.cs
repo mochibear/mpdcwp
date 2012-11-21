@@ -508,7 +508,7 @@ namespace MPDCWP
 
                 if (this.paused)
                 {
-                    Connection.SendCommand(MPDClient.PAUSE);
+                    Connection.SendCommand(MPDClient.PAUSE, "0");
                     this.paused = false;
                 }
                 else
@@ -522,7 +522,7 @@ namespace MPDCWP
         // Player control pauses
         private void playerControl_Pause(object sender, EventArgs e)
         {
-            Connection.SendCommand(MPDClient.PAUSE);
+            Connection.SendCommand(MPDClient.PAUSE, "1");
             this.paused = true;
             PlayerStatus = "Paused";
         }

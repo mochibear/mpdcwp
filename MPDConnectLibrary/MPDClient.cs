@@ -55,7 +55,9 @@ namespace MPDConnectLibrary
         private Socket connection;
 
 
-        // Is client connecting
+        /// <summary>
+        /// Is client connecting
+        /// </summary>
         public bool Connecting { get; private set; }
 
 
