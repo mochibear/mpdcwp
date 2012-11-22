@@ -244,7 +244,7 @@ namespace MPDCWP
         {
             if (!this.Connection.IsConnected)
             {
-                Deployment.Current.Dispatcher.BeginInvoke(() => {(Application.Current as App).AllTracks.Clear(); });
+                //Deployment.Current.Dispatcher.BeginInvoke(() => {(Application.Current as App).AllTracks.Clear(); });
                 Loading(false);
             }
             else if (Playlist.Changed)

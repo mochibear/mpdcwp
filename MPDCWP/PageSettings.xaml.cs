@@ -299,8 +299,8 @@ namespace MPDCWP
             this.Loading(false);
             (Application.Current as App).Playlist.Clear();            
             //(Application.Current as App).AllTracks.Clear();
-            (Application.Current as App).Artists.Clear();
-            (Application.Current as App).SelectedArtist = null;
+            //(Application.Current as App).Artists.Clear();
+            //(Application.Current as App).SelectedArtist = null;
             this.buttonConnect.IsEnabled = true;
             this.connection.Disconnect();
             buttonDisconnect.IsEnabled = this.connection.IsConnected;
